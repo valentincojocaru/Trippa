@@ -15,8 +15,8 @@ import Sheet from "@/components/Sheet";
 import { toast } from "@/components/Toast";
 import { useTrip } from "@/lib/useTrip";
 import { store, useStoreVersion } from "@/lib/store";
+import { budgetOf, setBudgetOf, expensesOf, setExpensesOf } from "@/lib/tripBudget";
 import { fmt, daysTo } from "@/lib/util";
-import type { Expense } from "@/lib/types";
 
 const CATS: Record<string, { c: string; bg: string; e: string }> = {
   Food: { c: "var(--purple)", bg: "rgba(124,92,255,.14)", e: "🍜" },
@@ -37,8 +37,9 @@ export default function BudgetPage() {
 
   if (!mounted) return <div className="screen-body" />;
 
-  const budget = store.get<number>("budget", trip?.budget || 2000);
-  const expenses = store.get<Expense[]>("expenses", []);
+  // budget & expenses are scoped to THIS trip (params.id), not global state
+  const budget = budgetOf(trip);
+  const expenses = expensesOf(trip);
   const spent = expenses.reduce((s, e) => s + (+e.eur || 0), 0);
   const pct = Math.min(100, Math.round((spent / (budget || 1)) * 100));
   const over = spent > budget;
@@ -145,7 +146,7 @@ export default function BudgetPage() {
                         onClick={() => {
                           const arr = [...expenses];
                           arr.splice(gi, 1);
-                          store.set("expenses", arr);
+                          setExpensesOf(trip, arr);
                         }}
                       >
                         delete
@@ -179,7 +180,7 @@ export default function BudgetPage() {
             if (!r || !r.t || !(parseFloat(r.eur) > 0)) return;
             const arr = [...expenses];
             arr.unshift({ t: r.t, cat: r.cat, eur: parseFloat(r.eur), note: "", day: 0 });
-            store.set("expenses", arr);
+            setExpensesOf(trip, arr);
             toast("Expense added");
           }}
         />
@@ -192,7 +193,7 @@ export default function BudgetPage() {
           onClose={(r) => {
             setEditBudget(false);
             if (r && parseFloat(r.b) > 0) {
-              store.set("budget", parseFloat(r.b));
+              setBudgetOf(trip, parseFloat(r.b));
               toast("Budget updated");
             }
           }}

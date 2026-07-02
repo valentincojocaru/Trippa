@@ -14,6 +14,7 @@ import ScreenHeader from "@/components/ScreenHeader";
 import EmptyState from "@/components/EmptyState";
 import EstimateBadge from "@/components/EstimateBadge";
 import { useTrip } from "@/lib/useTrip";
+import { affiliateService } from "@/lib/services/affiliateService";
 import { hotelService } from "@/lib/services/hotelService";
 import { affiliate } from "@/lib/services/config";
 import { store } from "@/lib/store";
@@ -228,7 +229,21 @@ export default function HotelsPage() {
             <div className="sec-lbl mb-2">COMPARE PRICES</div>
             <div className="flex flex-col gap-[9px]">
               {dealsFor(open, city).map((d, i) => (
-                <a key={d.id} className={"ht-deal-row tap" + (i === 0 ? " best" : "")} href={d.url} target="_blank" rel="noopener noreferrer">
+                <a
+                  key={d.id}
+                  className={"ht-deal-row tap" + (i === 0 ? " best" : "")}
+                  href={d.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() =>
+                    affiliateService.logClick({
+                      provider: d.id,
+                      bookingType: "hotel",
+                      destination: city,
+                      tripId: trip.id,
+                    })
+                  }
+                >
                   <span className="ht-dot" style={{ background: d.color }} />
                   <div className="flex-1">
                     <b className="text-[13.5px]">{d.name}</b>

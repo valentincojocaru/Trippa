@@ -32,7 +32,8 @@ import { trending, photoURL } from "@/data/destinations";
 import { activeReminderCount } from "@/lib/reminders";
 import { userService } from "@/lib/services/userService";
 import { wxEmoji } from "@/lib/services/weatherService";
-import type { Expense, Trip } from "@/lib/types";
+import { budgetOf, spentOf } from "@/lib/tripBudget";
+import type { Trip } from "@/lib/types";
 
 function useCountdown(dateStr: string | null) {
   const [now, setNow] = useState(() => Date.now());
@@ -70,9 +71,8 @@ export default function HomePage() {
   const trip = trips.find((t) => t.id === activeId) || trips[0] || null;
   const cd = useCountdown(mounted && trip?.date ? trip.date : null);
 
-  const budget = store.get<number>("budget", 2000);
-  const expenses = store.get<Expense[]>("expenses", []);
-  const spent = expenses.reduce((s, e) => s + (+e.eur || 0), 0);
+  const budget = budgetOf(trip);
+  const spent = spentOf(trip);
   const pct = Math.min(100, Math.round((spent / (budget || 1)) * 100));
   const bellCount = mounted ? activeReminderCount() : 0;
   const name = mounted ? userService.profile()?.name || "" : "";

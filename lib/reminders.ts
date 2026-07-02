@@ -9,11 +9,12 @@
 
 import { store } from "./store";
 import { daysTo } from "./util";
+import { budgetOf, spentOf } from "./tripBudget";
+import { tripService } from "./services/userService";
 import type {
   PackingGroup,
   Ticket,
   WalletDoc,
-  Expense,
   ItineraryDay,
   CustomReminder,
 } from "./types";
@@ -127,10 +128,10 @@ export function autoReminders(): Omit<Reminder, "done" | "auto">[] {
       });
   });
 
-  // budget watch
-  const budget = store.get<number>("budget", 2000);
-  const exp = store.get<Expense[]>("expenses", []);
-  const spent = exp.reduce((s, e) => s + (+e.eur || 0), 0);
+  // budget watch — scoped to the active trip
+  const activeTrip = tripService.active();
+  const budget = budgetOf(activeTrip);
+  const spent = spentOf(activeTrip);
   if (spent > budget * 0.8)
     out.push({
       id: "budget",

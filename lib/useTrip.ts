@@ -13,6 +13,8 @@ export function useTrip(id: string): { trip: Trip | null; mounted: boolean } {
   useStoreVersion();
   useEffect(() => setMounted(true), []);
   if (!mounted) return { trip: null, mounted: false };
-  const trip = id === "active" ? tripService.active() : tripService.byId(id) || tripService.active();
+  // an unknown concrete id must NOT fall back to another trip — the caller
+  // renders its empty state so the user can tell the trip is gone
+  const trip = id === "active" ? tripService.active() : tripService.byId(id);
   return { trip, mounted: true };
 }

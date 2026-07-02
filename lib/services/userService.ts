@@ -106,7 +106,8 @@ export const tripService = {
     store.set("hotels", trip.hotels || []);
     store.set("hero", trip.hero || null);
     if (trip.packing && trip.packing.length) store.set("packing", trip.packing);
-    if (trip.budget) store.set("budget", trip.budget);
+    // budget/expenses are per-trip (trippa.budget.<id> / trippa.expenses.<id>)
+    // and read through lib/tripBudget.ts — nothing global to overwrite here
     if (trip.date) store.set("tripDate", trip.date);
     store.set("chat", [
       {

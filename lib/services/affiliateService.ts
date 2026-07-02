@@ -1,8 +1,11 @@
 /* ============================================================
    Trippa — affiliateService
-   Builds affiliate-ready deep links + logs every click locally
-   (and to Supabase when connected). Trippa never processes payments;
-   it always sends the user to a trusted booking partner.
+   Builds affiliate-ready deep links; clicks are logged ONLY when
+   the user actually hands off to a partner (call logClick from the
+   Book button's onClick), never while constructing URLs — so
+   affiliate_clicks reflects real conversions. Trippa never
+   processes payments; it always sends the user to a trusted
+   booking partner.
    ============================================================ */
 
 import { affiliate, isReal } from "./config";
@@ -20,44 +23,9 @@ export type AffiliateClick = {
   marker: string;
 };
 
-function log(entry: Omit<AffiliateClick, "userId" | "ts">): AffiliateClick {
-  let userId = "anon";
-  try {
-    const p = JSON.parse(window.localStorage.getItem("trippa.profile") || "null");
-    if (p && p.id) userId = p.id;
-  } catch {}
-  const rec: AffiliateClick = { userId, ts: Date.now(), ...entry };
-  try {
-    const k = "trippa.affiliate_clicks";
-    const arr = JSON.parse(window.localStorage.getItem(k) || "[]");
-    arr.push(rec);
-    window.localStorage.setItem(k, JSON.stringify(arr.slice(-200)));
-  } catch {}
-  // mirror to Supabase if available (fire-and-forget)
-  if (isReal("supabase")) {
-    try {
-      supabaseClient.insert("affiliate_clicks", {
-        user_id: rec.userId === "anon" ? null : rec.userId,
-        trip_id: rec.tripId || null,
-        provider: rec.provider,
-        booking_type: rec.bookingType,
-        destination: rec.destination || null,
-        marker: rec.marker,
-      });
-    } catch {}
-  }
-  return rec;
-}
-
 export const affiliateService = {
-  flight(originIata: string, destIata: string, opts: { tripId?: string } = {}) {
-    log({
-      provider: "aviasales",
-      bookingType: "flight",
-      destination: destIata,
-      tripId: opts.tripId,
-      marker: M(),
-    });
+  /* ---- URL builders (no side effects) ---- */
+  flightUrl(originIata: string, destIata: string) {
     return (
       "https://www.aviasales.com/search?origin_iata=" +
       encodeURIComponent(originIata || "") +
@@ -67,14 +35,7 @@ export const affiliateService = {
       M()
     );
   },
-  hotel(city: string, opts: { tripId?: string } = {}) {
-    log({
-      provider: "hotellook",
-      bookingType: "hotel",
-      destination: city,
-      tripId: opts.tripId,
-      marker: M(),
-    });
+  hotelUrl(city: string) {
     const b = affiliate.bookingAffiliateId;
     if (b)
       return (
@@ -90,32 +51,48 @@ export const affiliateService = {
       M()
     );
   },
-  activity(city: string, opts: { tripId?: string } = {}) {
-    log({
-      provider: "getyourguide",
-      bookingType: "activity",
-      destination: city,
-      tripId: opts.tripId,
-      marker: M(),
-    });
+  activityUrl(city: string) {
     return (
       "https://www.getyourguide.com/s/?q=" + encodeURIComponent(city || "") + "&partner_id=" + M()
     );
   },
-  insurance(opts: { tripId?: string } = {}) {
-    log({ provider: "ekta", bookingType: "insurance", tripId: opts.tripId, marker: M() });
+  insuranceUrl() {
     return "https://ektatraveling.tpx.lt/?marker=" + M();
   },
-  car(city: string, opts: { tripId?: string } = {}) {
-    log({
-      provider: "localrent",
-      bookingType: "car",
-      destination: city,
-      tripId: opts.tripId,
-      marker: M(),
-    });
+  carUrl() {
     return "https://localrent.com/?marker=" + M();
   },
+
+  /* ---- click logging (call on the actual user handoff) ---- */
+  logClick(entry: { provider: string; bookingType: string; destination?: string; tripId?: string }): AffiliateClick {
+    let userId = "anon";
+    try {
+      const p = JSON.parse(window.localStorage.getItem("trippa.profile") || "null");
+      if (p && p.id) userId = p.id;
+    } catch {}
+    const rec: AffiliateClick = { userId, ts: Date.now(), marker: M(), ...entry };
+    try {
+      const k = "trippa.affiliate_clicks";
+      const arr = JSON.parse(window.localStorage.getItem(k) || "[]");
+      arr.push(rec);
+      window.localStorage.setItem(k, JSON.stringify(arr.slice(-200)));
+    } catch {}
+    // mirror to Supabase if available (fire-and-forget)
+    if (isReal("supabase")) {
+      try {
+        supabaseClient.insert("affiliate_clicks", {
+          user_id: rec.userId === "anon" ? null : rec.userId,
+          trip_id: rec.tripId || null,
+          provider: rec.provider,
+          booking_type: rec.bookingType,
+          destination: rec.destination || null,
+          marker: rec.marker,
+        });
+      } catch {}
+    }
+    return rec;
+  },
+
   clicks(): AffiliateClick[] {
     try {
       return JSON.parse(window.localStorage.getItem("trippa.affiliate_clicks") || "[]");

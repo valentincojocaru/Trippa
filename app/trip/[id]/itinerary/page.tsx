@@ -15,6 +15,7 @@ import Sheet, { type SheetField } from "@/components/Sheet";
 import { toast } from "@/components/Toast";
 import { useTrip } from "@/lib/useTrip";
 import { store, useStoreVersion } from "@/lib/store";
+import { affiliateService } from "@/lib/services/affiliateService";
 import { aiService } from "@/lib/services/aiService";
 import { tripService } from "@/lib/services/userService";
 import type { ItineraryDay, Trip } from "@/lib/types";
@@ -157,6 +158,14 @@ export default function ItineraryPage() {
               target="_blank"
               rel="noopener noreferrer"
               style={{ textDecoration: "none", color: "inherit" }}
+              onClick={() =>
+                affiliateService.logClick({
+                  provider: "aviasales",
+                  bookingType: "flight",
+                  destination: trip.name,
+                  tripId: trip.id,
+                })
+              }
             >
               <span className="itile" style={{ width: 42, height: 42, borderRadius: 12, background: "var(--accent-soft)", color: "var(--accent)" }}>
                 <Plane size={20} strokeWidth={2} />
@@ -191,6 +200,14 @@ export default function ItineraryPage() {
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{ padding: 0, textDecoration: "none", color: "inherit" }}
+                onClick={() =>
+                  affiliateService.logClick({
+                    provider: "hotellook",
+                    bookingType: "hotel",
+                    destination: ht.city || trip.name,
+                    tripId: trip.id,
+                  })
+                }
               >
                 {ht.img && <div className="itin-hotel-img" style={{ backgroundImage: `url('${ht.img}')` }} />}
                 <div className="p-[13px] flex gap-[11px] items-center">

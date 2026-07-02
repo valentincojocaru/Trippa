@@ -68,7 +68,7 @@ function mockSearch(q: HotelQuery): HotelOption[] {
       breakfast: s % 3 === 0,
       deal: i === 1,
       img: "", // UI fills with a real photo at render
-      link: affiliateService.hotel(q.city || "", { tripId: q.tripId }),
+      link: affiliateService.hotelUrl(q.city || ""),
     });
   }
   if (q.pets) out = out.filter((h) => h.petFriendly);

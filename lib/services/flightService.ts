@@ -54,7 +54,7 @@ function mockSearch(q: FlightQuery): FlightOption[] {
         priceEUR: price * pax,
         perPax: price,
         deal: i === 0,
-        link: affiliateService.flight(origin, dest, { tripId: q.tripId }),
+        link: affiliateService.flightUrl(origin, dest),
       };
     })
     .sort((a, b) => a.priceEUR - b.priceEUR);

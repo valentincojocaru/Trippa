@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import ScreenHeader from "@/components/ScreenHeader";
 import EmptyState from "@/components/EmptyState";
+import { affiliateService } from "@/lib/services/affiliateService";
 import { useTrip } from "@/lib/useTrip";
 import { store } from "@/lib/store";
 import { fmt } from "@/lib/util";
@@ -231,7 +232,20 @@ export default function TripResultsPage() {
                 <b className="text-[19px]">€{fmt(flightTotal)}</b>
                 <span className="dim text-[11px]"> est.</span>
               </div>
-              <a href={trip.flights?.link || "#"} target="_blank" rel="noopener noreferrer" className="rs-book tap">
+              <a
+                href={trip.flights?.link || "#"}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rs-book tap"
+                onClick={() =>
+                  affiliateService.logClick({
+                    provider: "aviasales",
+                    bookingType: "flight",
+                    destination: trip.itin?.[0]?.city || trip.name,
+                    tripId: trip.id,
+                  })
+                }
+              >
                 Search flights
               </a>
             </div>
@@ -276,7 +290,20 @@ export default function TripResultsPage() {
                       <b className="text-[16px]">€{fmt(h.priceEUR)}</b>
                       <span className="dim text-[11px]">/night</span>
                     </div>
-                    <a href={h.link || "#"} target="_blank" rel="noopener noreferrer" className="rs-book sm tap">
+                    <a
+                      href={h.link || "#"}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="rs-book sm tap"
+                      onClick={() =>
+                        affiliateService.logClick({
+                          provider: "hotellook",
+                          bookingType: "hotel",
+                          destination: h.city || trip.name,
+                          tripId: trip.id,
+                        })
+                      }
+                    >
                       Book
                     </a>
                   </div>

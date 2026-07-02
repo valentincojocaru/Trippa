@@ -351,7 +351,7 @@ export async function buildTrip(
     priceEUR: Math.round(hh.priceEUR || 90),
     why: hh.why || "",
     img: cityImg[hh.city] || null,
-    link: affiliateService.hotel((hh.city || "") + " " + (data.country || ""), { tripId }),
+    link: affiliateService.hotelUrl((hh.city || "") + " " + (data.country || "")),
   }));
   if (data.__mock) {
     // keyless path: pull labelled estimates from hotelService (applies pet/family rules)
@@ -384,9 +384,7 @@ export async function buildTrip(
     outDate: f.outDate || "",
     backDate: f.backDate || "",
     origin: data.origin || S.origin || "",
-    link: affiliateService.flight(data.origin || S.origin || "", cities[0] || data.name || "", {
-      tripId,
-    }),
+    link: affiliateService.flightUrl(data.origin || S.origin || "", cities[0] || data.name || ""),
   };
 
   const startDate = S.depart

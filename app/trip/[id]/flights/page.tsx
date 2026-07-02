@@ -14,6 +14,7 @@ import ScreenHeader from "@/components/ScreenHeader";
 import EmptyState from "@/components/EmptyState";
 import EstimateBadge from "@/components/EstimateBadge";
 import { useTrip } from "@/lib/useTrip";
+import { affiliateService } from "@/lib/services/affiliateService";
 import { flightService } from "@/lib/services/flightService";
 import { searchDestinations } from "@/data/destinations";
 import { store } from "@/lib/store";
@@ -127,7 +128,20 @@ export default function FlightsPage() {
                       <b className="text-[19px]">€{fmt(f.priceEUR)}</b>
                       <span className="dim text-[11px]"> total · €{fmt(f.perPax)} pp</span>
                     </div>
-                    <a href={f.link} target="_blank" rel="noopener noreferrer" className="rs-book sm tap">
+                    <a
+                      href={f.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="rs-book sm tap"
+                      onClick={() =>
+                        affiliateService.logClick({
+                          provider: "aviasales",
+                          bookingType: "flight",
+                          destination: f.destIata,
+                          tripId: trip.id,
+                        })
+                      }
+                    >
                       Book
                     </a>
                   </div>
