@@ -9,9 +9,8 @@ import { Plus, MapPin, ChevronRight, Trash2 } from "lucide-react";
 import { store, useStoreVersion } from "@/lib/store";
 import { tripService } from "@/lib/services/userService";
 import { daysTo, money } from "@/lib/util";
+import TripImage from "@/components/TripImage";
 import type { Favorite, Trip } from "@/lib/types";
-
-const FALLBACK = "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=700&q=70";
 
 export default function TripsPage() {
   const router = useRouter();
@@ -31,7 +30,6 @@ export default function TripsPage() {
     return d != null && d < 0;
   });
   const wish = store.get<Favorite[]>("favs", []);
-  const heroOf = (t: Trip) => t.hero || FALLBACK;
 
   const open = (t: Trip) => {
     tripService.activate(t);
@@ -50,7 +48,7 @@ export default function TripsPage() {
     const d = daysTo(t.date);
     return (
       <div className="mt-row tap" key={t.id} onClick={() => open(t)}>
-        <div className="mt-row-img" style={{ backgroundImage: `url('${heroOf(t)}')` }} />
+        <TripImage name={t.name} country={t.country} hero={t.hero} className="mt-row-img" />
         <div className="flex-1">
           <b className="text-[15px]">{t.name}</b>
           <div className="dim text-[12px] mt-[2px]">
@@ -140,7 +138,7 @@ export default function TripsPage() {
               const d = daysTo(f.date);
               return (
                 <div className="mt-feat tap" onClick={() => open(f)}>
-                  <div className="mt-feat-img" style={{ backgroundImage: `url('${heroOf(f)}')` }} />
+                  <TripImage name={f.name} country={f.country} hero={f.hero} className="mt-feat-img" />
                   <div className="mt-feat-ov" />
                   <div className="mt-feat-cap">
                     <div className="flex items-start justify-between">

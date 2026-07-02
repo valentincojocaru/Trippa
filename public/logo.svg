@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3E7BFF"/>
+      <stop offset="50%" stop-color="#5C5BF0"/>
+      <stop offset="100%" stop-color="#9B3FE6"/>
+    </linearGradient>
+    <radialGradient id="hl" cx="28%" cy="14%" r="90%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.30"/>
+      <stop offset="55%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="ds" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="10" stdDeviation="16" flood-color="#0B1220" flood-opacity="0.28"/>
+    </filter>
+  </defs>
+
+  <!-- brand gradient tile -->
+  <rect width="512" height="512" rx="118" fill="url(#bg)"/>
+  <rect width="512" height="512" rx="118" fill="url(#hl)"/>
+
+  <!-- flight trail: from the departure dot, arcing toward the plane -->
+  <circle cx="118" cy="394" r="15" fill="#ffffff" fill-opacity="0.9"/>
+  <path d="M118 394 C 190 412, 268 386, 302 306"
+        fill="none" stroke="#ffffff" stroke-opacity="0.6"
+        stroke-width="15" stroke-linecap="round" stroke-dasharray="1 40"/>
+
+  <!-- paper plane, nose to the top-right -->
+  <g transform="translate(168 100) scale(11.4)" filter="url(#ds)">
+    <path d="M22 2 L2 9.3 L10.6 13.4 Z" fill="#ffffff"/>
+    <path d="M22 2 L15 22 L10.6 13.4 Z" fill="#ffffff" fill-opacity="0.82"/>
+    <path d="M22 2 L10.6 13.4 L11.4 16.6 Z" fill="#ffffff" fill-opacity="0.55"/>
+  </g>
+</svg>

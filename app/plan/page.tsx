@@ -27,7 +27,8 @@ import TrippaMark from "@/components/TrippaMark";
 import { store } from "@/lib/store";
 import { toast } from "@/components/Toast";
 import { destinationService } from "@/lib/services/destinationService";
-import { trending, popular, photoURL } from "@/data/destinations";
+import { trending, popular } from "@/data/destinations";
+import DestImage from "@/components/DestImage";
 import { generateTrip } from "@/lib/tripGenerator";
 import { tripService } from "@/lib/services/userService";
 import { PLAN_DEFAULTS, type PlanState } from "@/lib/types";
@@ -371,9 +372,9 @@ function StepDestination({
         <div className="wz-ac">
           {results.map((d) => (
             <button key={d.city + d.iata} className="wz-ac-row tap" onClick={() => pick(d.city)}>
-              <span className="wz-ac-ph" style={{ backgroundImage: `url('${d.photo || photoURL(d)}')` }}>
+              <DestImage d={d} size={160} className="wz-ac-ph">
                 <span className="wz-ac-flag">{d.flag}</span>
-              </span>
+              </DestImage>
               <span className="flex flex-col gap-[2px] flex-1 min-w-0">
                 <b className="text-[15px] tracking-[-0.01em]">{d.city}</b>
                 <span className="dim text-[12px]">

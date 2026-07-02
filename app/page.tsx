@@ -28,7 +28,9 @@ import {
   BookOpen,
 } from "lucide-react";
 import { store, useStoreVersion } from "@/lib/store";
-import { trending, photoURL } from "@/data/destinations";
+import { trending } from "@/data/destinations";
+import DestImage from "@/components/DestImage";
+import TripImage from "@/components/TripImage";
 import { activeReminderCount } from "@/lib/reminders";
 import { userService } from "@/lib/services/userService";
 import { wxEmoji } from "@/lib/services/weatherService";
@@ -160,15 +162,12 @@ export default function HomePage() {
 
       {/* upcoming trip hero + countdown */}
       <div className="card overflow-hidden mt-[18px]" style={{ padding: 0 }}>
-        <div
+        <TripImage
+          name={trip?.name || ""}
+          country={trip?.country}
+          hero={trip?.hero}
           className="relative tap"
-          style={{
-            height: 168,
-            backgroundImage: trip?.hero ? `url('${trip.hero}')` : undefined,
-            backgroundColor: "#2a3550",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
+          style={{ height: 168 }}
           onClick={() => router.push(trip ? `/trip/${trip.id}` : "/plan")}
         >
           <div className="photo-cap-ov" />
@@ -186,7 +185,7 @@ export default function HomePage() {
                 : "Tap to start with Trippa AI ✨"}
             </div>
           </div>
-        </div>
+        </TripImage>
         {trip && cd && (
           <div className="countdown">
             <div className="cd-cell"><b>{cd.d}</b><small>DAYS</small></div>
@@ -238,7 +237,7 @@ export default function HomePage() {
               router.push("/plan");
             }}
           >
-            <div className="ai-sugg-img" style={{ backgroundImage: `url('${photoURL(d, 300)}')` }} />
+            <DestImage d={d} size={300} className="ai-sugg-img" />
             <b>
               {d.flag} {d.city}
             </b>

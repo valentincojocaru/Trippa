@@ -141,12 +141,13 @@ export function searchDestinations(q: string, limit = 6): Place[] {
     .map((x) => x.d);
 }
 
-/* Curated id → fast Unsplash; long tail → keyword photo; UI falls back to a flag tile. */
+/* Curated id → fast Unsplash. Destinations without a curated id get a REAL
+   photo of the place via Wikipedia at render time (lib/destPhoto.ts) — never
+   a random stock photo of somewhere else. */
 export function photoURL(d: Place, size = 160): string {
   if (d.ph)
     return `https://images.unsplash.com/photo-${d.ph}?w=${size}&h=${size}&fit=crop&q=70`;
-  const kw = encodeURIComponent((d.city + " " + d.country).replace(/\s+/g, ","));
-  return `https://loremflickr.com/${size}/${size}/${kw}`;
+  return "";
 }
 
 export const byTag = (t: string) => D.filter((d) => d.tags.includes(t));
