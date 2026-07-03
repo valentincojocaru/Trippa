@@ -32,6 +32,7 @@ import { trending } from "@/data/destinations";
 import DestImage from "@/components/DestImage";
 import TripImage from "@/components/TripImage";
 import TrippaMark from "@/components/TrippaMark";
+import { useT } from "@/lib/i18n";
 import { activeReminderCount } from "@/lib/reminders";
 import { userService } from "@/lib/services/userService";
 import { wxEmoji } from "@/lib/services/weatherService";
@@ -60,6 +61,7 @@ function useCountdown(dateStr: string | null) {
 export default function HomePage() {
   const router = useRouter();
   useStoreVersion();
+  const t = useT();
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
     setMounted(true);
@@ -100,27 +102,27 @@ export default function HomePage() {
 
   // computed client-side only — the page is prerendered at build time and
   // a baked-in greeting would mismatch on hydration
-  const [greet, setGreet] = useState("Hello");
+  const [greet, setGreet] = useState("");
   useEffect(() => {
     const hour = new Date().getHours();
-    setGreet(hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening");
+    setGreet(hour < 12 ? t("home.morning") : hour < 18 ? t("home.afternoon") : t("home.evening"));
   }, []);
 
   const qa = useMemo(
     () => [
-      { t: "Itinerary", Icon: CalendarDays, bg: "linear-gradient(160deg,rgba(37,99,235,.17),rgba(37,99,235,.07))", c: "var(--accent)", href: "/trip/active/itinerary" },
-      { t: "Explore", Icon: MapIcon, bg: "linear-gradient(160deg,rgba(124,92,255,.18),rgba(124,92,255,.07))", c: "var(--purple)", href: "/tools/guide" },
-      { t: "AI Chat", Icon: MessageCircle, bg: "linear-gradient(160deg,rgba(37,99,235,.17),rgba(37,99,235,.07))", c: "var(--accent)", href: "/chat" },
-      { t: "Hotels", Icon: Building2, bg: "linear-gradient(160deg,rgba(37,99,235,.17),rgba(37,99,235,.07))", c: "var(--blue)", href: "/trip/active/hotels" },
-      { t: "Packing", Icon: Luggage, bg: "linear-gradient(160deg,rgba(202,138,4,.2),rgba(202,138,4,.08))", c: "var(--yellow)", href: "/trip/active/packing" },
-      { t: "Budget", Icon: CreditCard, bg: "linear-gradient(160deg,rgba(22,163,74,.18),rgba(22,163,74,.07))", c: "var(--green)", href: "/trip/active/budget" },
-      { t: "Converter", Icon: ArrowUpDown, bg: "linear-gradient(160deg,rgba(22,163,74,.18),rgba(22,163,74,.07))", c: "var(--green)", href: "/tools/currency" },
-      { t: "Weather", Icon: CloudSun, bg: "linear-gradient(160deg,rgba(37,99,235,.17),rgba(37,99,235,.07))", c: "var(--blue)", href: "/tools/weather" },
-      { t: "Tickets", Icon: TicketIcon, bg: "linear-gradient(160deg,rgba(37,99,235,.17),rgba(37,99,235,.07))", c: "var(--accent)", href: "/tools/tickets" },
-      { t: "Wallet", Icon: WalletIcon, bg: "linear-gradient(160deg,rgba(22,163,74,.18),rgba(22,163,74,.07))", c: "var(--green)", href: "/tools/wallet" },
-      { t: "Journal", Icon: BookOpen, bg: "linear-gradient(160deg,rgba(219,39,119,.18),rgba(219,39,119,.07))", c: "var(--pink)", href: "/tools/journal" },
+      { t: t("qa.itinerary"), Icon: CalendarDays, bg: "linear-gradient(160deg,rgba(37,99,235,.17),rgba(37,99,235,.07))", c: "var(--accent)", href: "/trip/active/itinerary" },
+      { t: t("qa.explore"), Icon: MapIcon, bg: "linear-gradient(160deg,rgba(124,92,255,.18),rgba(124,92,255,.07))", c: "var(--purple)", href: "/tools/guide" },
+      { t: t("qa.aichat"), Icon: MessageCircle, bg: "linear-gradient(160deg,rgba(37,99,235,.17),rgba(37,99,235,.07))", c: "var(--accent)", href: "/chat" },
+      { t: t("qa.hotels"), Icon: Building2, bg: "linear-gradient(160deg,rgba(37,99,235,.17),rgba(37,99,235,.07))", c: "var(--blue)", href: "/trip/active/hotels" },
+      { t: t("qa.packing"), Icon: Luggage, bg: "linear-gradient(160deg,rgba(202,138,4,.2),rgba(202,138,4,.08))", c: "var(--yellow)", href: "/trip/active/packing" },
+      { t: t("qa.budget"), Icon: CreditCard, bg: "linear-gradient(160deg,rgba(22,163,74,.18),rgba(22,163,74,.07))", c: "var(--green)", href: "/trip/active/budget" },
+      { t: t("qa.converter"), Icon: ArrowUpDown, bg: "linear-gradient(160deg,rgba(22,163,74,.18),rgba(22,163,74,.07))", c: "var(--green)", href: "/tools/currency" },
+      { t: t("qa.weather"), Icon: CloudSun, bg: "linear-gradient(160deg,rgba(37,99,235,.17),rgba(37,99,235,.07))", c: "var(--blue)", href: "/tools/weather" },
+      { t: t("qa.tickets"), Icon: TicketIcon, bg: "linear-gradient(160deg,rgba(37,99,235,.17),rgba(37,99,235,.07))", c: "var(--accent)", href: "/tools/tickets" },
+      { t: t("qa.wallet"), Icon: WalletIcon, bg: "linear-gradient(160deg,rgba(22,163,74,.18),rgba(22,163,74,.07))", c: "var(--green)", href: "/tools/wallet" },
+      { t: t("qa.journal"), Icon: BookOpen, bg: "linear-gradient(160deg,rgba(219,39,119,.18),rgba(219,39,119,.07))", c: "var(--pink)", href: "/tools/journal" },
     ],
-    []
+    [t]
   );
 
   return (
@@ -157,13 +159,13 @@ export default function HomePage() {
           {greet}
           {name ? `, ${name}` : ""} ☀️
         </div>
-        <h1 className="text-[27px] mt-[3px]">Where to next?</h1>
+        <h1 className="text-[27px] mt-[3px]">{t("home.whereNext")}</h1>
       </div>
 
       {/* search → planner */}
       <div className="home-search tap" onClick={() => router.push("/plan")}>
         <Search size={19} color="#9295A0" strokeWidth={2} />
-        <span>Search destinations, trips…</span>
+        <span>{t("home.searchPh")}</span>
         <span className="hs-go">
           <ArrowRight size={17} color="#fff" strokeWidth={2.4} />
         </span>
@@ -182,25 +184,25 @@ export default function HomePage() {
           <div className="photo-cap-ov" />
           <div className="absolute left-[14px] right-[14px] bottom-3">
             <span className="chip-ico" style={{ background: "rgba(255,255,255,.92)", color: "var(--accent)" }}>
-              {trip ? "Upcoming Trip" : "Trippa AI"}
+              {trip ? t("home.upcoming") : "Trippa AI"}
             </span>
             <div className="text-[23px] font-extrabold text-white tracking-[-0.02em] mt-[9px]">
-              {trip ? trip.name : "Plan your first trip"}
+              {trip ? trip.name : t("home.planFirst")}
             </div>
             <div className="text-[12.5px]" style={{ color: "rgba(255,255,255,.86)" }}>
               {trip && trip.date
                 ? new Date(trip.date).toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" }) +
                   (trip.days ? ` · ${trip.days} days` : "")
-                : "Tap to start with Trippa AI ✨"}
+                : t("home.tapToStart")}
             </div>
           </div>
         </TripImage>
         {trip && cd && (
           <div className="countdown">
-            <div className="cd-cell"><b>{cd.d}</b><small>DAYS</small></div>
-            <div className="cd-cell"><b>{String(cd.h).padStart(2, "0")}</b><small>HRS</small></div>
-            <div className="cd-cell"><b>{String(cd.m).padStart(2, "0")}</b><small>MIN</small></div>
-            <div className="cd-cell"><b>{String(cd.s).padStart(2, "0")}</b><small>SEC</small></div>
+            <div className="cd-cell"><b>{cd.d}</b><small>{t("home.days")}</small></div>
+            <div className="cd-cell"><b>{String(cd.h).padStart(2, "0")}</b><small>{t("home.hrs")}</small></div>
+            <div className="cd-cell"><b>{String(cd.m).padStart(2, "0")}</b><small>{t("home.min")}</small></div>
+            <div className="cd-cell"><b>{String(cd.s).padStart(2, "0")}</b><small>{t("home.sec")}</small></div>
           </div>
         )}
       </div>
@@ -208,32 +210,32 @@ export default function HomePage() {
       {/* weather + budget widgets */}
       <div className="grid grid-cols-2 gap-3 mt-[14px]">
         <div className="card tap p-[15px]" onClick={() => router.push("/tools/weather")}>
-          <div className="dim text-[12px]">Weather</div>
+          <div className="dim text-[12px]">{t("home.weather")}</div>
           <div className="flex items-center gap-2 mt-[7px]">
             <span className="text-[30px] leading-none">{wx ? wxEmoji(wx.code) : "🌍"}</span>
             <b className="text-[25px] tracking-[-0.02em]">{wx ? wx.max + "°" : "—"}</b>
           </div>
           <div className="dim text-[11.5px] mt-[7px]">
-            {wx ? `H: ${wx.max}°  L: ${wx.min}°` : "Plan a trip"}
+            {wx ? `H: ${wx.max}°  L: ${wx.min}°` : t("home.planATrip")}
           </div>
         </div>
         <div className="card tap p-[15px]" onClick={() => router.push("/trip/active/budget")}>
           <div className="flex items-start justify-between">
-            <div className="dim text-[12px]">Budget</div>
+            <div className="dim text-[12px]">{t("home.budget")}</div>
             <div className="ring-sm" style={{ ["--p" as any]: pct, width: 44, height: 44 }}>
               <b className="text-[11px]">{pct}%</b>
             </div>
           </div>
           <b className="text-[21px] block mt-1 tracking-[-0.02em]">€{spent.toLocaleString()}</b>
-          <div className="dim text-[11.5px]">of €{budget.toLocaleString()}</div>
+          <div className="dim text-[11.5px]">{t("home.of")} €{budget.toLocaleString()}</div>
         </div>
       </div>
 
       {/* trending destinations */}
       <div className="flex items-center justify-between mt-[22px]">
-        <b className="text-[16px]">Trending destinations</b>
+        <b className="text-[16px]">{t("home.trending")}</b>
         <span className="t-acc tap text-[13px] font-semibold" onClick={() => router.push("/plan")}>
-          Plan one
+          {t("home.planOne")}
         </span>
       </div>
       <div className="ai-sugg-row">
@@ -257,9 +259,9 @@ export default function HomePage() {
 
       {/* quick actions */}
       <div className="flex items-center justify-between mt-[22px] mb-[14px]">
-        <b className="text-[16px]">Quick Actions</b>
+        <b className="text-[16px]">{t("home.quickActions")}</b>
         <span className="t-acc tap text-[13px] font-semibold" onClick={() => router.push("/reminders")}>
-          Reminders
+          {t("home.reminders")}
         </span>
       </div>
       <div className="qa-grid">

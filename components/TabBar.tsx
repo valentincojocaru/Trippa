@@ -5,6 +5,7 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import { Home, Map as MapIcon, MessageCircle, User, Sparkles } from "lucide-react";
+import { useT } from "@/lib/i18n";
 
 const HIDDEN_PREFIXES = [
   "/plan",
@@ -16,6 +17,7 @@ const HIDDEN_PREFIXES = [
 export default function TabBar() {
   const pathname = usePathname() || "/";
   const router = useRouter();
+  const t = useT();
   if (HIDDEN_PREFIXES.some((p) => pathname.startsWith(p))) return null;
 
   const tab = (
@@ -37,13 +39,13 @@ export default function TabBar() {
 
   return (
     <div className="tabbar">
-      {tab("/", "Home", Home, pathname === "/")}
-      {tab("/trips", "Trips", MapIcon, pathname.startsWith("/trips"))}
+      {tab("/", t("tab.home"), Home, pathname === "/")}
+      {tab("/trips", t("tab.trips"), MapIcon, pathname.startsWith("/trips"))}
       <div className="tab-fab" onClick={() => router.push("/plan")} aria-label="Plan a trip">
         <Sparkles size={24} color="#fff" strokeWidth={2.2} />
       </div>
-      {tab("/chat", "Chat", MessageCircle, pathname.startsWith("/chat"))}
-      {tab("/profile", "Profile", User, pathname.startsWith("/profile"))}
+      {tab("/chat", t("tab.chat"), MessageCircle, pathname.startsWith("/chat"))}
+      {tab("/profile", t("tab.profile"), User, pathname.startsWith("/profile"))}
     </div>
   );
 }

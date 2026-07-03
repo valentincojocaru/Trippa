@@ -13,6 +13,7 @@ import ScreenHeader from "@/components/ScreenHeader";
 import { env, setEnv, isReal } from "@/lib/services/config";
 import { userService } from "@/lib/services/userService";
 import { toast } from "@/components/Toast";
+import { useT, getLang, setLang } from "@/lib/i18n";
 import { store } from "@/lib/store";
 
 const KEYS: { k: string; label: string; provider: string; note: string }[] = [
@@ -29,6 +30,7 @@ const KEYS: { k: string; label: string; provider: string; note: string }[] = [
 
 export default function SettingsPage() {
   const router = useRouter();
+  const t = useT();
   const [vals, setVals] = useState<Record<string, string>>({});
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
@@ -41,13 +43,21 @@ export default function SettingsPage() {
 
   return (
     <>
-      <ScreenHeader title="Settings" backHref="/profile" />
+      <ScreenHeader title={t("pf.settings")} backHref="/profile" />
       <div className="screen-body">
-        <div className="sec-lbl mb-2">API KEYS</div>
+        <div className="sec-lbl mb-2">{t("st.language")}</div>
+        <div className="seg acc mb-5">
+          {(["ro", "en"] as const).map((l) => (
+            <span key={l} className={getLang() === l ? "on" : ""} onClick={() => setLang(l)}>
+              {l === "ro" ? "🇷🇴 Română" : "🇬🇧 English"}
+            </span>
+          ))}
+        </div>
+
+        <div className="sec-lbl mb-2">{t("st.apiKeys")}</div>
         <div className="card p-[14px] flex flex-col gap-[13px]">
           <div className="muted text-[12.5px] leading-[1.5]">
-            Keys are stored only on this device (localStorage) and flip the matching service from
-            labelled demo data to live data. Leave any key blank — the app keeps working.
+            {t("st.keysNote")}
           </div>
           {KEYS.map(({ k, label, provider, note }) => (
             <div className="field" key={k}>
@@ -78,23 +88,21 @@ export default function SettingsPage() {
             onClick={() => {
               KEYS.forEach(({ k }) => setEnv(k, vals[k] || ""));
               store.set("_envBump", Date.now());
-              toast("Keys saved on this device ✓");
+              toast(t("st.keysSaved"));
             }}
           >
-            Save keys
+            {t("st.saveKeys")}
           </button>
         </div>
 
-        <div className="sec-lbl mt-5 mb-2">PRIVACY</div>
+        <div className="sec-lbl mt-5 mb-2">{t("st.privacy")}</div>
         <div className="card p-[14px]">
           <div className="muted text-[12.5px] leading-[1.5]">
-            Trips, expenses, documents and journal entries live on this device (and sync to your own
-            Supabase project when configured). Trippa never processes payments — bookings hand off to
-            trusted partners. Affiliate markers are public by design.
+            {t("st.privacyNote")}
           </div>
         </div>
 
-        <div className="sec-lbl mt-5 mb-2">ACCOUNT</div>
+        <div className="sec-lbl mt-5 mb-2">{t("st.account")}</div>
         <button
           className="btn btn-ghost tap"
           onClick={() => {
@@ -103,7 +111,7 @@ export default function SettingsPage() {
             router.push("/auth");
           }}
         >
-          Sign out
+          {t("st.signOut")}
         </button>
       </div>
     </>

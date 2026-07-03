@@ -10,10 +10,12 @@ import { store, useStoreVersion } from "@/lib/store";
 import { tripService } from "@/lib/services/userService";
 import { daysTo, money } from "@/lib/util";
 import TripImage from "@/components/TripImage";
+import { useT } from "@/lib/i18n";
 import type { Favorite, Trip } from "@/lib/types";
 
 export default function TripsPage() {
   const router = useRouter();
+  const t = useT();
   useStoreVersion();
   const [tab, setTab] = useState<"upcoming" | "past" | "wishlist">("upcoming");
   const [mounted, setMounted] = useState(false);
@@ -21,38 +23,38 @@ export default function TripsPage() {
   if (!mounted) return <div className="screen-body" />;
 
   const all = store.get<Trip[]>("trips", []);
-  const up = all.filter((t) => {
-    const d = daysTo(t.date);
+  const up = all.filter((x) => {
+    const d = daysTo(x.date);
     return d == null || d >= 0;
   });
-  const past = all.filter((t) => {
-    const d = daysTo(t.date);
+  const past = all.filter((x) => {
+    const d = daysTo(x.date);
     return d != null && d < 0;
   });
   const wish = store.get<Favorite[]>("favs", []);
 
-  const open = (t: Trip) => {
-    tripService.activate(t);
-    router.push("/trip/" + t.id);
+  const open = (tp: Trip) => {
+    tripService.activate(tp);
+    router.push("/trip/" + tp.id);
   };
 
-  const empty = (t: string, s: string) => (
+  const empty = (title: string, sub: string) => (
     <div className="card p-[30px] text-center">
       <div className="text-[34px]">🧳</div>
-      <b className="block mt-[10px] text-[15px]">{t}</b>
-      <div className="muted text-[13px] mt-[5px] leading-[1.5]">{s}</div>
+      <b className="block mt-[10px] text-[15px]">{title}</b>
+      <div className="muted text-[13px] mt-[5px] leading-[1.5]">{sub}</div>
     </div>
   );
 
-  const row = (t: Trip) => {
-    const d = daysTo(t.date);
+  const row = (tp: Trip) => {
+    const d = daysTo(tp.date);
     return (
-      <div className="mt-row tap" key={t.id} onClick={() => open(t)}>
-        <TripImage name={t.name} country={t.country} hero={t.hero} className="mt-row-img" />
+      <div className="mt-row tap" key={tp.id} onClick={() => open(tp)}>
+        <TripImage name={tp.name} country={tp.country} hero={tp.hero} className="mt-row-img" />
         <div className="flex-1">
-          <b className="text-[15px]">{t.name}</b>
+          <b className="text-[15px]">{tp.name}</b>
           <div className="dim text-[12px] mt-[2px]">
-            {t.country || ""} · {money(t.budget || 0)}
+            {tp.country || ""} · {money(tp.budget || 0)}
           </div>
         </div>
         <div className="text-right" style={{ flex: "0 0 auto" }}>
@@ -61,7 +63,7 @@ export default function TripsPage() {
               <b className="text-[15px]" style={{ color: "var(--accent)" }}>
                 {d}
               </b>
-              <div className="dim text-[10px]">days</div>
+              <div className="dim text-[10px]">{t("tr.days")}</div>
             </>
           ) : (
             <span
@@ -69,7 +71,7 @@ export default function TripsPage() {
               style={{ color: "#C2456B" }}
               onClick={(e) => {
                 e.stopPropagation();
-                tripService.remove(t.id);
+                tripService.remove(tp.id);
               }}
             >
               <Trash2 size={15} strokeWidth={2} />
@@ -85,19 +87,19 @@ export default function TripsPage() {
   return (
     <div className="screen-body">
       <div className="flex items-center justify-between">
-        <b className="text-[22px] tracking-[-0.02em]">My Trips</b>
+        <b className="text-[22px] tracking-[-0.02em]">{t("tr.myTrips")}</b>
         <button className="mt-new tap" onClick={() => router.push("/plan")}>
           <Plus size={15} color="#fff" strokeWidth={2.4} />
-          New Trip
+          {t("tr.new")}
         </button>
       </div>
 
       <div className="mt-tabs mt-[18px]">
         {(
           [
-            ["upcoming", "Upcoming"],
-            ["past", "Past"],
-            ["wishlist", "Wishlist"],
+            ["upcoming", t("tr.upcoming")] as const,
+            ["past", t("tr.past")] as const,
+            ["wishlist", t("tr.wishlist")] as const,
           ] as const
         ).map(([k, l]) => (
           <span key={k} className={"mt-tab" + (tab === k ? " on" : "")} onClick={() => setTab(k)}>
@@ -124,12 +126,12 @@ export default function TripsPage() {
               </div>
             ))
           ) : (
-            empty("No saved places yet", "Tap the bookmark on places in City Guide to save them.")
+            empty(t("tr.noWish"), t("tr.noWishSub"))
           )
         ) : !data.length ? (
           empty(
-            tab === "upcoming" ? "No upcoming trips" : "No past trips",
-            tab === "upcoming" ? "Tap “New Trip” to plan one with AI." : "Your finished trips will appear here."
+            tab === "upcoming" ? t("tr.noUpcoming") : t("tr.noPast"),
+            tab === "upcoming" ? t("tr.noUpcomingSub") : t("tr.noPastSub")
           )
         ) : tab === "upcoming" ? (
           <>
@@ -145,10 +147,10 @@ export default function TripsPage() {
                       <div>
                         <div className="text-[21px] font-extrabold text-white tracking-[-0.02em]">{f.name}</div>
                         <div className="text-[12.5px] mt-[2px]" style={{ color: "rgba(255,255,255,.85)" }}>
-                          {f.country || ""} · {f.days} days
+                          {f.country || ""} · {f.days} {t("tr.days")}
                         </div>
                       </div>
-                      {d != null && <span className="mt-badge">{d > 0 ? "In " + d + "d" : d === 0 ? "Today" : "Now"}</span>}
+                      {d != null && <span className="mt-badge">{d > 0 ? t("tr.inDays") + " " + d + "d" : d === 0 ? t("tr.today") : t("tr.now")}</span>}
                     </div>
                   </div>
                 </div>

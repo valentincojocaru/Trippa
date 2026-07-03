@@ -28,6 +28,7 @@ import ScreenHeader from "@/components/ScreenHeader";
 import EmptyState from "@/components/EmptyState";
 import { affiliateService } from "@/lib/services/affiliateService";
 import { useTrip } from "@/lib/useTrip";
+import { useT } from "@/lib/i18n";
 import { store } from "@/lib/store";
 import { fmt } from "@/lib/util";
 import type { PlanState } from "@/lib/types";
@@ -49,14 +50,15 @@ export default function TripResultsPage() {
   const router = useRouter();
   const params = useParams<{ id: string }>();
   const { trip, mounted } = useTrip(params.id);
+  const t = useT();
 
   if (!mounted) return <div className="screen-body" />;
   if (!trip)
     return (
       <>
-        <ScreenHeader title="Your Trip" backHref="/" />
+        <ScreenHeader title={t("rs.yourTrip")} backHref="/" />
         <div className="screen-body">
-          <EmptyState emoji="🧳" text={"No trip yet — plan one with AI."} ctaLabel="Plan a trip" ctaHref="/plan" />
+          <EmptyState emoji="🧳" text={t("rs.noTrip")} ctaLabel={t("home.planATrip")} ctaHref="/plan" />
         </div>
       </>
     );
@@ -64,7 +66,7 @@ export default function TripResultsPage() {
   const prof = store.get<Partial<PlanState>>("wizardProfile", {});
   const pets = prof.pets === "yes";
   const party = (prof.adults || 1) + (prof.children || 0) + (prof.infants || 0) + (prof.seniors || 0);
-  const travelers = party > 1 ? `${party} travelers` : "Solo trip";
+  const travelers = party > 1 ? `${party} ${t("rs.travelers")}` : t("rs.solo");
 
   /* ----- budget breakdown — the user's budget is never overwritten ----- */
   const party2 = party || 1;
@@ -82,10 +84,10 @@ export default function TripResultsPage() {
   const overBudget = hasBudget && diff < 0;
   const savings = Math.max(0, diff);
   const cats = [
-    { l: "Flights", v: flightTotal, c: "var(--accent)" },
-    { l: "Stays", v: hotelTotal, c: "var(--green)" },
-    { l: "Food", v: foodEst, c: "var(--yellow)" },
-    { l: "Activities", v: actEst, c: "var(--purple)" },
+    { l: t("rs.catFlights"), v: flightTotal, c: "var(--accent)" },
+    { l: t("rs.catStays"), v: hotelTotal, c: "var(--green)" },
+    { l: t("rs.catFood"), v: foodEst, c: "var(--yellow)" },
+    { l: t("rs.catActivities"), v: actEst, c: "var(--purple)" },
   ];
   const maxC = Math.max(...cats.map((c) => c.v), 1);
 
@@ -99,14 +101,14 @@ export default function TripResultsPage() {
 
   const base = `/trip/${trip.id}`;
   const links = [
-    { href: `${base}/itinerary`, t: "Itinerary", bg: "rgba(37,99,235,.1)", c: "var(--accent)", Icon: CalendarDays },
-    { href: `${base}/map`, t: "Map", bg: "rgba(22,163,74,.12)", c: "var(--green)", Icon: MapIcon },
-    { href: `${base}/hotels`, t: "All stays", bg: "rgba(124,92,255,.12)", c: "var(--purple)", Icon: Building2 },
-    { href: `/tools/weather`, t: "Weather", bg: "rgba(37,99,235,.1)", c: "var(--accent)", Icon: CloudSun },
-    { href: `/tools/wallet`, t: "Documents", bg: "rgba(202,138,4,.13)", c: "var(--yellow)", Icon: FileText },
-    { href: `/tools/currency`, t: "Currency", bg: "rgba(22,163,74,.12)", c: "var(--green)", Icon: CircleDollarSign },
-    { href: `/chat`, t: "Concierge", bg: "rgba(124,92,255,.12)", c: "var(--purple)", Icon: MessageCircle },
-    { href: `${base}/packing`, t: "Packing", bg: "rgba(219,39,119,.1)", c: "var(--pink)", Icon: Luggage },
+    { href: `${base}/itinerary`, t: t("qa.itinerary"), bg: "rgba(37,99,235,.1)", c: "var(--accent)", Icon: CalendarDays },
+    { href: `${base}/map`, t: t("rs.lMap"), bg: "rgba(22,163,74,.12)", c: "var(--green)", Icon: MapIcon },
+    { href: `${base}/hotels`, t: t("rs.lStays"), bg: "rgba(124,92,255,.12)", c: "var(--purple)", Icon: Building2 },
+    { href: `/tools/weather`, t: t("qa.weather"), bg: "rgba(37,99,235,.1)", c: "var(--accent)", Icon: CloudSun },
+    { href: `/tools/wallet`, t: t("rs.lDocs"), bg: "rgba(202,138,4,.13)", c: "var(--yellow)", Icon: FileText },
+    { href: `/tools/currency`, t: t("rs.lCurrency"), bg: "rgba(22,163,74,.12)", c: "var(--green)", Icon: CircleDollarSign },
+    { href: `/chat`, t: t("rs.lConcierge"), bg: "rgba(124,92,255,.12)", c: "var(--purple)", Icon: MessageCircle },
+    { href: `${base}/packing`, t: t("qa.packing"), bg: "rgba(219,39,119,.1)", c: "var(--pink)", Icon: Luggage },
   ];
 
   const hotels = (trip.hotels || []).slice(0, 3);
@@ -114,18 +116,18 @@ export default function TripResultsPage() {
 
   return (
     <>
-      <ScreenHeader title="Your Trip" backHref="/" />
+      <ScreenHeader title={t("rs.yourTrip")} backHref="/" />
       <div className="screen-body" style={{ paddingTop: 10 }}>
         {/* hero */}
         <div className="rs-hero" style={trip.hero ? { backgroundImage: `url('${trip.hero}')` } : undefined}>
           <div className="rs-hero-ov" />
           <div className="rs-hero-top">
-            <span className="rs-chip">{trip.mock ? "⚡ Estimate plan" : "✨ AI-planned"}</span>
+            <span className="rs-chip">{trip.mock ? t("rs.estimatePlan") : t("rs.aiPlanned")}</span>
           </div>
           <div className="rs-hero-cap">
             <div className="rs-hero-sub">{trip.country || ""}</div>
             <h1 className="rs-hero-h1">{trip.name || "Your trip"}</h1>
-            <div className="rs-hero-meta">{[dateStr, `${trip.days} days`, travelers].filter(Boolean).join(" · ")}</div>
+            <div className="rs-hero-meta">{[dateStr, `${trip.days} ${t("rs.days")}`, travelers].filter(Boolean).join(" · ")}</div>
           </div>
         </div>
 
@@ -136,33 +138,33 @@ export default function TripResultsPage() {
               <div className="rs-overb">
                 <span className="rs-sav-ic">⚠️</span>
                 <div className="flex-1">
-                  <b>Over budget by €{fmt(-diff)}</b>
+                  <b>{t("rs.overBudget")} €{fmt(-diff)}</b>
                   <span className="dim block text-[11.5px]">
                     Cheapest plan we found is €{fmt(spend)} — your budget is €{fmt(budget)}.
                   </span>
                 </div>
               </div>
               <div className="rs-alts">
-                <div className="rs-alts-h">Ways to fit your €{fmt(budget)} budget</div>
+                <div className="rs-alts-h">{t("rs.waysToFit")} €{fmt(budget)}</div>
                 <button className="rs-alt tap" onClick={() => router.push("/plan")}>
                   <span>📅</span>
                   <div>
-                    <b>Shift your dates</b>
-                    <span>Mid-week &amp; off-peak flights are often cheaper</span>
+                    <b>{t("rs.shiftDates")}</b>
+                    <span>{t("rs.shiftDatesSub")}</span>
                   </div>
                 </button>
                 <button className="rs-alt tap" onClick={() => router.push(`${base}/hotels`)}>
                   <span>🏨</span>
                   <div>
-                    <b>Pick a cheaper stay</b>
-                    <span>Browse all hotels and sort by price</span>
+                    <b>{t("rs.cheaperStay")}</b>
+                    <span>{t("rs.cheaperStaySub")}</span>
                   </div>
                 </button>
                 <button className="rs-alt tap" onClick={() => router.push("/plan")}>
                   <span>✈️</span>
                   <div>
-                    <b>Try a nearby airport</b>
-                    <span>or a similar, lower-cost destination</span>
+                    <b>{t("rs.nearbyAirport")}</b>
+                    <span>{t("rs.nearbyAirportSub")}</span>
                   </div>
                 </button>
               </div>
@@ -171,7 +173,7 @@ export default function TripResultsPage() {
             <div className="rs-savings">
               <span className="rs-sav-ic">💶</span>
               <div className="flex-1">
-                <b>You&apos;re €{fmt(savings)} under budget</b>
+                <b>{t("rs.youAre")} €{fmt(savings)} {t("rs.underBudget")}</b>
                 <span className="dim block text-[11.5px]">
                   Plan totals €{fmt(spend)} of your €{fmt(budget)}
                 </span>
@@ -180,15 +182,15 @@ export default function TripResultsPage() {
           ))}
 
         {/* budget breakdown */}
-        <div className="rs-sec">Budget breakdown</div>
+        <div className="rs-sec">{t("rs.breakdown")}</div>
         <div className="card p-4">
           <div className="flex items-start justify-between mb-[14px]">
             <div>
-              <div className="dim text-[11.5px]">Estimated total</div>
+              <div className="dim text-[11.5px]">{t("rs.estTotal")}</div>
               <b className="text-[26px] tracking-[-0.02em]">€{fmt(spend)}</b>
             </div>
             <div className="text-right">
-              <div className="dim text-[11.5px]">Your budget</div>
+              <div className="dim text-[11.5px]">{t("rs.yourBudget")}</div>
               <b
                 className="text-[15px]"
                 style={{ color: !hasBudget ? "var(--text-2)" : overBudget ? "var(--pink)" : "var(--green)" }}
@@ -206,11 +208,11 @@ export default function TripResultsPage() {
               <b className="rs-bar-v">€{fmt(c.v)}</b>
             </div>
           ))}
-          <div className="rs-estnote">Figures are AI estimates for planning — tap any Book button for live prices.</div>
+          <div className="rs-estnote">{t("rs.estNote")}</div>
         </div>
 
         {/* best flight — requires a known departure airport */}
-        <div className="rs-sec">Best flight</div>
+        <div className="rs-sec">{t("rs.bestFlight")}</div>
         {hasOrigin ? (
           <div className="card p-4">
             <div className="rs-fl-route">
@@ -246,7 +248,7 @@ export default function TripResultsPage() {
                   })
                 }
               >
-                Search flights
+                {t("rs.searchFlights")}
               </a>
             </div>
           </div>
@@ -256,19 +258,19 @@ export default function TripResultsPage() {
               <Plane size={20} />
             </span>
             <div className="flex-1">
-              <b className="text-[14px]">Select your departure airport</b>
-              <div className="dim text-[12px] mt-[2px]">We need your departure city to find flights.</div>
+              <b className="text-[14px]">{t("rs.selectAirport")}</b>
+              <div className="dim text-[12px] mt-[2px]">{t("rs.needAirport")}</div>
             </div>
             <button className="rs-book sm tap" onClick={() => router.push("/plan")}>
-              Add
+              {t("rs.add")}
             </button>
           </div>
         )}
 
         {/* stays */}
-        <div className="rs-sec">{pets ? "Pet-friendly stays 🐾" : "Where to stay"}</div>
+        <div className="rs-sec">{pets ? t("rs.petStays") : t("rs.whereToStay")}</div>
         <div className="rs-estnote" style={{ margin: "-4px 0 11px", border: "none", padding: 0 }}>
-          ⚡ AI estimates — tap Book for live prices.
+          {t("rs.estTap")}
         </div>
         <div className="flex flex-col gap-[11px]">
           {hotels.length ? (
@@ -288,7 +290,7 @@ export default function TripResultsPage() {
                   <div className="flex items-center justify-between mt-[9px]">
                     <div>
                       <b className="text-[16px]">€{fmt(h.priceEUR)}</b>
-                      <span className="dim text-[11px]">/night</span>
+                      <span className="dim text-[11px]">{t("rs.night")}</span>
                     </div>
                     <a
                       href={h.link || "#"}
@@ -304,7 +306,7 @@ export default function TripResultsPage() {
                         })
                       }
                     >
-                      Book
+                      {t("rs.book")}
                     </a>
                   </div>
                 </div>
@@ -320,13 +322,13 @@ export default function TripResultsPage() {
         {/* good to know */}
         {(trip.bestTime || trip.weather || trip.transport) && (
           <>
-            <div className="rs-sec">Good to know</div>
+            <div className="rs-sec">{t("rs.goodToKnow")}</div>
             <div className="card p-[15px] flex flex-col gap-[10px]">
               {trip.bestTime && (
                 <div className="rs-fact">
                   <span>🗓️</span>
                   <div>
-                    <b className="text-[13px]">Best time to visit</b>
+                    <b className="text-[13px]">{t("rs.bestTime")}</b>
                     <div className="dim text-[12px]">{trip.bestTime}</div>
                   </div>
                 </div>
@@ -335,7 +337,7 @@ export default function TripResultsPage() {
                 <div className="rs-fact">
                   <span>🌤️</span>
                   <div>
-                    <b className="text-[13px]">Weather</b>
+                    <b className="text-[13px]">{t("rs.weather")}</b>
                     <div className="dim text-[12px]">{trip.weather}</div>
                   </div>
                 </div>
@@ -344,7 +346,7 @@ export default function TripResultsPage() {
                 <div className="rs-fact">
                   <span>🚆</span>
                   <div>
-                    <b className="text-[13px]">Getting around</b>
+                    <b className="text-[13px]">{t("rs.transport")}</b>
                     <div className="dim text-[12px]">{trip.transport}</div>
                   </div>
                 </div>
@@ -354,7 +356,7 @@ export default function TripResultsPage() {
         )}
 
         {/* quick links */}
-        <div className="rs-sec">Everything for this trip</div>
+        <div className="rs-sec">{t("rs.everything")}</div>
         <div className="rs-links">
           {links.map(({ href, t, bg, c, Icon }) => (
             <button key={t} className="rs-link tap" onClick={() => router.push(href)}>
@@ -369,7 +371,7 @@ export default function TripResultsPage() {
         {/* AI tips */}
         {trip.tips && trip.tips.length > 0 && (
           <>
-            <div className="rs-sec">AI tips</div>
+            <div className="rs-sec">{t("rs.tips")}</div>
             <div className="flex flex-col gap-[9px]">
               {trip.tips.slice(0, 5).map((t, i) => (
                 <div className="rs-tip" key={i}>
@@ -382,7 +384,7 @@ export default function TripResultsPage() {
         )}
 
         <button className="btn btn-primary tap mt-[22px]" onClick={() => router.push(`${base}/itinerary`)}>
-          Open day-by-day plan
+          {t("rs.openPlan")}
         </button>
         <div style={{ height: 30 }} />
       </div>

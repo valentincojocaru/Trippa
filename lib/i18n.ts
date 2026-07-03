@@ -1,0 +1,327 @@
+"use client";
+
+/* ============================================================
+   Trippa — lightweight i18n (EN + RO)
+   Language lives in trippa.lang (Settings switcher); first run
+   auto-detects from the browser. `useT()` re-renders on change.
+   Adding a language = adding a column here.
+   ============================================================ */
+
+import { useSyncExternalStore } from "react";
+import { store } from "./store";
+
+export type Lang = "en" | "ro";
+
+const dict: Record<string, { en: string; ro: string }> = {
+  /* tab bar */
+  "tab.home": { en: "Home", ro: "Acasă" },
+  "tab.trips": { en: "Trips", ro: "Călătorii" },
+  "tab.chat": { en: "Chat", ro: "Chat" },
+  "tab.profile": { en: "Profile", ro: "Profil" },
+
+  /* home */
+  "home.morning": { en: "Good morning", ro: "Bună dimineața" },
+  "home.afternoon": { en: "Good afternoon", ro: "Bună ziua" },
+  "home.evening": { en: "Good evening", ro: "Bună seara" },
+  "home.whereNext": { en: "Where to next?", ro: "Încotro urmează?" },
+  "home.searchPh": { en: "Search destinations, trips…", ro: "Caută destinații, călătorii…" },
+  "home.upcoming": { en: "Upcoming Trip", ro: "Călătoria următoare" },
+  "home.planFirst": { en: "Plan your first trip", ro: "Planifică prima ta călătorie" },
+  "home.tapToStart": { en: "Tap to start with Trippa AI ✨", ro: "Apasă și pornește cu Trippa AI ✨" },
+  "home.weather": { en: "Weather", ro: "Vremea" },
+  "home.planATrip": { en: "Plan a trip", ro: "Planifică o călătorie" },
+  "home.budget": { en: "Budget", ro: "Buget" },
+  "home.of": { en: "of", ro: "din" },
+  "home.trending": { en: "Trending destinations", ro: "Destinații în trend" },
+  "home.planOne": { en: "Plan one", ro: "Planifică una" },
+  "home.quickActions": { en: "Quick Actions", ro: "Acțiuni rapide" },
+  "home.reminders": { en: "Reminders", ro: "Notificări" },
+  "home.days": { en: "DAYS", ro: "ZILE" },
+  "home.hrs": { en: "HRS", ro: "ORE" },
+  "home.min": { en: "MIN", ro: "MIN" },
+  "home.sec": { en: "SEC", ro: "SEC" },
+
+  /* quick actions */
+  "qa.itinerary": { en: "Itinerary", ro: "Itinerariu" },
+  "qa.explore": { en: "Explore", ro: "Explorează" },
+  "qa.aichat": { en: "AI Chat", ro: "AI Chat" },
+  "qa.hotels": { en: "Hotels", ro: "Hoteluri" },
+  "qa.packing": { en: "Packing", ro: "Bagaje" },
+  "qa.budget": { en: "Budget", ro: "Buget" },
+  "qa.converter": { en: "Converter", ro: "Valută" },
+  "qa.weather": { en: "Weather", ro: "Vremea" },
+  "qa.tickets": { en: "Tickets", ro: "Bilete" },
+  "qa.wallet": { en: "Wallet", ro: "Documente" },
+  "qa.journal": { en: "Journal", ro: "Jurnal" },
+
+  /* onboarding */
+  "ob.skip": { en: "Skip", ro: "Sari peste" },
+  "ob.headline1": { en: "Plan a whole trip", ro: "Planifică o vacanță întreagă" },
+  "ob.headline2": { en: "in one sentence.", ro: "dintr-o singură frază." },
+  "ob.sub": {
+    en: "Tell Trippa where and how much. It books, maps, budgets and guides — so you just travel.",
+    ro: "Spune-i lui Trippa unde și cu ce buget. Îți găsește zboruri, hoteluri, hartă și plan — tu doar călătorești.",
+  },
+  "ob.ready": { en: "Itinerary ready in 8 seconds", ro: "Itinerariu gata în 8 secunde" },
+  "ob.anywhere": { en: "🌍 Anywhere", ro: "🌍 Oriunde" },
+  "ob.days7": { en: "7 days", ro: "7 zile" },
+  "ob.start": { en: "Get started", ro: "Începe" },
+
+  /* auth */
+  "auth.welcome": { en: "Welcome aboard", ro: "Bine ai venit la bord" },
+  "auth.sub": { en: "Sign in to plan your next adventure.", ro: "Autentifică-te și planifică următoarea aventură." },
+  "auth.signin": { en: "Sign in", ro: "Autentificare" },
+  "auth.register": { en: "Register", ro: "Cont nou" },
+  "auth.name": { en: "Name", ro: "Nume" },
+  "auth.namePh": { en: "Your name", ro: "Numele tău" },
+  "auth.email": { en: "Email", ro: "Email" },
+  "auth.password": { en: "Password", ro: "Parolă" },
+  "auth.create": { en: "Create account", ro: "Creează cont" },
+  "auth.or": { en: "or", ro: "sau" },
+  "auth.guest": { en: "Continue as guest", ro: "Continuă ca oaspete" },
+  "auth.guestNote": {
+    en: "Cloud sync needs Supabase keys (see .env.example). Guest mode keeps everything on-device.",
+    ro: "Sincronizarea în cloud cere chei Supabase (vezi .env.example). Modul oaspete ține totul pe dispozitiv.",
+  },
+  "auth.missing": { en: "Please enter your email and password.", ro: "Completează emailul și parola." },
+  "auth.guestToast": { en: "Continuing as guest — data stays on this device", ro: "Continui ca oaspete — datele rămân pe acest dispozitiv" },
+
+  /* wizard */
+  "wz.planTrip": { en: "Plan a Trip", ro: "Planifică o călătorie" },
+  "wz.t1": { en: "Where to?", ro: "Încotro?" },
+  "wz.s1": { en: "Search any city — or let Trippa surprise you.", ro: "Caută orice oraș — sau lasă Trippa să te surprindă." },
+  "wz.t2": { en: "When?", ro: "Când?" },
+  "wz.s2": { en: "Pick your dates. We calculate the rest.", ro: "Alege datele. Noi calculăm restul." },
+  "wz.t3": { en: "Who's going?", ro: "Cine merge?" },
+  "wz.s3": { en: "Your travel party.", ro: "Echipa ta de călătorie." },
+  "wz.t4": { en: "Budget", ro: "Buget" },
+  "wz.s4": { en: "Set your spend — Trippa plans within it.", ro: "Setează bugetul — Trippa planifică în limita lui." },
+  "wz.t5": { en: "Luggage", ro: "Bagaje" },
+  "wz.s5": { en: "What are you bringing along?", ro: "Ce iei cu tine?" },
+  "wz.continue": { en: "Continue", ro: "Continuă" },
+  "wz.reviewTrip": { en: "Review trip", ro: "Verifică planul" },
+  "wz.searchPh": { en: "Where do you want to go?", ro: "Unde vrei să mergi?" },
+  "wz.flyingFrom": { en: "Flying from", ro: "Pleci din" },
+  "wz.flyingFromPh": { en: "Your city or airport — e.g. Bucharest (OTP)", ro: "Orașul sau aeroportul tău — ex. București (OTP)" },
+  "wz.tripType": { en: "TRIP TYPE", ro: "TIP CĂLĂTORIE" },
+  "wz.round": { en: "Round trip", ro: "Dus-întors" },
+  "wz.oneway": { en: "One-way", ro: "Doar dus" },
+  "wz.surprise": { en: "Surprise me", ro: "Surprinde-mă" },
+  "wz.surpriseSub": { en: "Let AI choose a destination for your vibe & budget", ro: "Lasă AI-ul să aleagă destinația după stilul și bugetul tău" },
+  "wz.trendingNow": { en: "🔥 TRENDING NOW", ro: "🔥 ÎN TREND ACUM" },
+  "wz.popularMonth": { en: "⭐ POPULAR THIS MONTH", ro: "⭐ POPULARE LUNA ASTA" },
+  "wz.weekend": { en: "Weekend", ro: "Weekend" },
+  "wz.oneWeek": { en: "One week", ro: "O săptămână" },
+  "wz.twoWeeks": { en: "Two weeks", ro: "Două săptămâni" },
+  "wz.nights7": { en: "7 nights", ro: "7 nopți" },
+  "wz.nights14": { en: "14 nights", ro: "14 nopți" },
+  "wz.friSun": { en: "Fri → Sun", ro: "Vin → Dum" },
+  "wz.flex": { en: "FLEXIBILITY", ro: "FLEXIBILITATE" },
+  "wz.exact": { en: "Exact", ro: "Exacte" },
+  "wz.tripLength": { en: "Trip length", ro: "Durata călătoriei" },
+  "wz.departure": { en: "Departure", ro: "Plecare" },
+  "wz.selectDates": { en: "Select dates", ro: "Alege datele" },
+  "wz.cheap": { en: "Cheap", ro: "Ieftin" },
+  "wz.average": { en: "Average", ro: "Mediu" },
+  "wz.pricey": { en: "Pricey", ro: "Scump" },
+  "wz.hintExact": { en: "Green dots mark the cheapest days to fly.", ro: "Punctele verzi arată cele mai ieftine zile de zbor." },
+  "wz.hintFlex": { en: "We'll scan nearby dates and flag cheaper options automatically.", ro: "Scanăm datele apropiate și îți arătăm automat variantele mai ieftine." },
+  "wz.adults": { en: "Adults", ro: "Adulți" },
+  "wz.adultsSub": { en: "13+ years", ro: "13+ ani" },
+  "wz.children": { en: "Children", ro: "Copii" },
+  "wz.childrenSub": { en: "2–12 years", ro: "2–12 ani" },
+  "wz.childAges": { en: "Ages of children", ro: "Vârstele copiilor" },
+  "wz.infants": { en: "Infants", ro: "Bebeluși" },
+  "wz.infantsSub": { en: "Under 2", ro: "Sub 2 ani" },
+  "wz.seniors": { en: "Seniors", ro: "Seniori" },
+  "wz.seniorsSub": { en: "65+ years", ro: "65+ ani" },
+  "wz.pets": { en: "PETS", ro: "ANIMALE" },
+  "wz.withPets": { en: "Travelling with pets", ro: "Călătorești cu animale" },
+  "wz.petsOn": { en: "We'll only show pet-friendly stays 🐾", ro: "Îți arătăm doar cazări pet-friendly 🐾" },
+  "wz.petsOff": { en: "Tap to add your furry companions", ro: "Apasă și adaugă-ți companionii blănoși" },
+  "wz.petCount": { en: "Number of pets", ro: "Număr de animale" },
+  "wz.perPerson": { en: "Per person", ro: "De persoană" },
+  "wz.totalBudget": { en: "Total budget", ro: "Buget total" },
+  "wz.perPersonTg": { en: "Budget is per person", ro: "Bugetul e de persoană" },
+  "wz.perPersonSub": { en: "Otherwise total for the whole party", ro: "Altfel, e totalul pentru tot grupul" },
+  "wz.tip": { en: "Trippa tip", ro: "Sfat Trippa" },
+  "wz.personal": { en: "Personal item", ro: "Bagaj mic" },
+  "wz.personalSub": { en: "Bag under the seat", ro: "Sub scaun" },
+  "wz.cabin": { en: "Cabin bag", ro: "Bagaj de cabină" },
+  "wz.cabinSub": { en: "Overhead carry-on", ro: "Deasupra scaunului" },
+  "wz.checked": { en: "Checked bag", ro: "Bagaj de cală" },
+  "wz.checkedSub": { en: "Goes in the hold", ro: "Merge la cală" },
+  "wz.bagsPer": { en: "Checked bags per traveler", ro: "Bagaje de cală / călător" },
+  "wz.extras": { en: "EXTRAS", ro: "EXTRA" },
+  "wz.sports": { en: "Sports gear", ro: "Echipament sport" },
+  "wz.sportsSub": { en: "Skis, golf, surf", ro: "Schiuri, golf, surf" },
+  "wz.oversized": { en: "Oversized", ro: "Supradimensionat" },
+  "wz.oversizedSub": { en: "Instruments, strollers", ro: "Instrumente, cărucioare" },
+  "wz.completeStep": { en: "Please complete this step", ro: "Completează acest pas" },
+
+  /* review */
+  "rv.title": { en: "Review & confirm", ro: "Verifică și confirmă" },
+  "rv.surpriseDest": { en: "Surprise destination ✨", ro: "Destinație surpriză ✨" },
+  "rv.yourTrip": { en: "Your trip", ro: "Călătoria ta" },
+  "rv.days": { en: "days", ro: "zile" },
+  "rv.destination": { en: "Destination", ro: "Destinație" },
+  "rv.surpriseMe": { en: "Surprise me", ro: "Surprinde-mă" },
+  "rv.dates": { en: "Dates", ro: "Date" },
+  "rv.travelers": { en: "Travelers", ro: "Călători" },
+  "rv.budget": { en: "Budget", ro: "Buget" },
+  "rv.hint": {
+    en: "✨ Trippa will find the best flights & stays, build a day-by-day plan, and estimate your full budget.",
+    ro: "✨ Trippa găsește cele mai bune zboruri și cazări, face planul zi cu zi și estimează bugetul complet.",
+  },
+  "rv.required": { en: "REQUIRED INFO", ro: "INFORMAȚII OBLIGATORII" },
+  "rv.missing": { en: "Please complete", ro: "Te rugăm completează" },
+  "rv.beforeGen": { en: "before generating.", ro: "înainte de generare." },
+  "rv.generate": { en: "✨ Generate my trip", ro: "✨ Generează călătoria" },
+
+  /* processing */
+  "px.planning": { en: "Planning your trip", ro: "Îți planificăm călătoria" },
+  "px.to": { en: "to", ro: "spre" },
+  "px.talking": { en: "Talking to Trippa AI…", ro: "Vorbim cu Trippa AI…" },
+  "px.flights": { en: "Finding the best flights", ro: "Căutăm cele mai bune zboruri" },
+  "px.hotels": { en: "Searching top-rated hotels", ro: "Căutăm hoteluri de top" },
+  "px.petFilter": { en: "Filtering pet-friendly stays", ro: "Filtrăm cazările pet-friendly" },
+  "px.route": { en: "Building the perfect route", ro: "Construim ruta perfectă" },
+  "px.food": { en: "Picking great restaurants", ro: "Alegem restaurante bune" },
+  "px.weather": { en: "Checking the weather", ro: "Verificăm vremea" },
+  "px.budget": { en: "Optimizing your budget", ro: "Optimizăm bugetul" },
+  "px.packing": { en: "Creating your packing list", ro: "Facem lista de bagaje" },
+  "px.together": { en: "Putting it all together", ro: "Punem totul cap la cap" },
+  "px.saving": { en: "Saving your trip…", ro: "Salvăm călătoria…" },
+  "px.noKeyTitle": { en: "Add your AI key", ro: "Adaugă cheia ta AI" },
+  "px.failTitle": { en: "Couldn't build that trip", ro: "Nu am putut construi călătoria" },
+  "px.noKeyBody": {
+    en: "To plan AI trips, paste your OpenAI or Anthropic key in Settings — it stays only on your device.",
+    ro: "Pentru planuri AI, pune cheia OpenAI sau Anthropic în Setări — rămâne doar pe dispozitivul tău.",
+  },
+  "px.failBody": { en: "The planner needs a connection. Check you're online and try again.", ro: "Planificatorul are nevoie de internet. Verifică conexiunea și încearcă din nou." },
+  "px.openSettings": { en: "Open Settings", ro: "Deschide Setările" },
+  "px.tryAgain": { en: "Try again", ro: "Încearcă din nou" },
+
+  /* results */
+  "rs.yourTrip": { en: "Your Trip", ro: "Călătoria ta" },
+  "rs.aiPlanned": { en: "✨ AI-planned", ro: "✨ Plan AI" },
+  "rs.estimatePlan": { en: "⚡ Estimate plan", ro: "⚡ Plan estimativ" },
+  "rs.overBudget": { en: "Over budget by", ro: "Peste buget cu" },
+  "rs.underBudget": { en: "under budget", ro: "sub buget" },
+  "rs.youAre": { en: "You're", ro: "Ești cu" },
+  "rs.waysToFit": { en: "Ways to fit your budget of", ro: "Cum te încadrezi în bugetul de" },
+  "rs.shiftDates": { en: "Shift your dates", ro: "Mută datele" },
+  "rs.shiftDatesSub": { en: "Mid-week & off-peak flights are often cheaper", ro: "Zborurile la mijloc de săptămână sunt adesea mai ieftine" },
+  "rs.cheaperStay": { en: "Pick a cheaper stay", ro: "Alege o cazare mai ieftină" },
+  "rs.cheaperStaySub": { en: "Browse all hotels and sort by price", ro: "Vezi toate hotelurile, sortate după preț" },
+  "rs.nearbyAirport": { en: "Try a nearby airport", ro: "Încearcă un aeroport apropiat" },
+  "rs.nearbyAirportSub": { en: "or a similar, lower-cost destination", ro: "sau o destinație similară, mai ieftină" },
+  "rs.breakdown": { en: "Budget breakdown", ro: "Structura bugetului" },
+  "rs.estTotal": { en: "Estimated total", ro: "Total estimat" },
+  "rs.yourBudget": { en: "Your budget", ro: "Bugetul tău" },
+  "rs.catFlights": { en: "Flights", ro: "Zboruri" },
+  "rs.catStays": { en: "Stays", ro: "Cazare" },
+  "rs.catFood": { en: "Food", ro: "Mâncare" },
+  "rs.catActivities": { en: "Activities", ro: "Activități" },
+  "rs.estNote": { en: "Figures are AI estimates for planning — tap any Book button for live prices.", ro: "Cifrele sunt estimări AI pentru planificare — apasă Rezervă pentru prețuri live." },
+  "rs.bestFlight": { en: "Best flight", ro: "Cel mai bun zbor" },
+  "rs.searchFlights": { en: "Search flights", ro: "Caută zboruri" },
+  "rs.selectAirport": { en: "Select your departure airport", ro: "Alege aeroportul de plecare" },
+  "rs.needAirport": { en: "We need your departure city to find flights.", ro: "Avem nevoie de orașul de plecare ca să găsim zboruri." },
+  "rs.add": { en: "Add", ro: "Adaugă" },
+  "rs.petStays": { en: "Pet-friendly stays 🐾", ro: "Cazări pet-friendly 🐾" },
+  "rs.whereToStay": { en: "Where to stay", ro: "Unde stai" },
+  "rs.estTap": { en: "⚡ AI estimates — tap Book for live prices.", ro: "⚡ Estimări AI — apasă Rezervă pentru prețuri live." },
+  "rs.book": { en: "Book", ro: "Rezervă" },
+  "rs.night": { en: "/night", ro: "/noapte" },
+  "rs.goodToKnow": { en: "Good to know", ro: "Bine de știut" },
+  "rs.bestTime": { en: "Best time to visit", ro: "Cea mai bună perioadă" },
+  "rs.weather": { en: "Weather", ro: "Vremea" },
+  "rs.transport": { en: "Getting around", ro: "Cum te deplasezi" },
+  "rs.everything": { en: "Everything for this trip", ro: "Tot pentru această călătorie" },
+  "rs.tips": { en: "AI tips", ro: "Sfaturi AI" },
+  "rs.openPlan": { en: "Open day-by-day plan", ro: "Deschide planul zi cu zi" },
+  "rs.noTrip": { en: "No trip yet — plan one with AI.", ro: "Nicio călătorie încă — planifică una cu AI." },
+  "rs.lMap": { en: "Map", ro: "Hartă" },
+  "rs.lStays": { en: "All stays", ro: "Cazări" },
+  "rs.lDocs": { en: "Documents", ro: "Documente" },
+  "rs.lCurrency": { en: "Currency", ro: "Valută" },
+  "rs.lConcierge": { en: "Concierge", ro: "Concierge" },
+  "rs.travelers": { en: "travelers", ro: "călători" },
+  "rs.solo": { en: "Solo trip", ro: "Călătorie solo" },
+  "rs.days": { en: "days", ro: "zile" },
+
+  /* trips */
+  "tr.myTrips": { en: "My Trips", ro: "Călătoriile mele" },
+  "tr.new": { en: "New Trip", ro: "Călătorie nouă" },
+  "tr.upcoming": { en: "Upcoming", ro: "Viitoare" },
+  "tr.past": { en: "Past", ro: "Trecute" },
+  "tr.wishlist": { en: "Wishlist", ro: "Favorite" },
+  "tr.noUpcoming": { en: "No upcoming trips", ro: "Nicio călătorie viitoare" },
+  "tr.noUpcomingSub": { en: "Tap “New Trip” to plan one with AI.", ro: "Apasă „Călătorie nouă” și planifică una cu AI." },
+  "tr.noPast": { en: "No past trips", ro: "Nicio călătorie trecută" },
+  "tr.noPastSub": { en: "Your finished trips will appear here.", ro: "Călătoriile încheiate apar aici." },
+  "tr.noWish": { en: "No saved places yet", ro: "Niciun loc salvat încă" },
+  "tr.noWishSub": { en: "Tap the bookmark on places in City Guide to save them.", ro: "Apasă semnul de carte pe locuri din Ghid ca să le salvezi." },
+  "tr.inDays": { en: "In", ro: "În" },
+  "tr.today": { en: "Today", ro: "Azi" },
+  "tr.now": { en: "Now", ro: "Acum" },
+  "tr.days": { en: "days", ro: "zile" },
+
+  /* profile + settings */
+  "pf.traveler": { en: "Traveler", ro: "Călător" },
+  "pf.guestNote": { en: "Guest — data stays on this device", ro: "Oaspete — datele rămân pe dispozitiv" },
+  "pf.myTrips": { en: "My Trips", ro: "Călătoriile mele" },
+  "pf.trips": { en: "trips", ro: "călătorii" },
+  "pf.saved": { en: "Saved Places", ro: "Locuri salvate" },
+  "pf.savedSub": { en: "Your wishlist", ro: "Lista ta de dorințe" },
+  "pf.tickets": { en: "Tickets & Passes", ro: "Bilete și carduri" },
+  "pf.ticketsSub": { en: "Boarding passes, bookings", ro: "Boarding pass-uri, rezervări" },
+  "pf.wallet": { en: "Travel Wallet", ro: "Portofel de călătorie" },
+  "pf.walletSub": { en: "Documents, offline", ro: "Documente, offline" },
+  "pf.reminders": { en: "Reminders", ro: "Notificări" },
+  "pf.remindersSub": { en: "Notifications & nudges", ro: "Notificări și alerte" },
+  "pf.help": { en: "Help & Concierge", ro: "Ajutor & Concierge" },
+  "pf.helpSub": { en: "Ask Trippa anything", ro: "Întreabă-l pe Trippa orice" },
+  "pf.settings": { en: "Settings", ro: "Setări" },
+  "pf.settingsSub": { en: "Account, API keys, privacy", ro: "Cont, chei API, confidențialitate" },
+  "st.language": { en: "LANGUAGE", ro: "LIMBĂ" },
+  "st.apiKeys": { en: "API KEYS", ro: "CHEI API" },
+  "st.privacy": { en: "PRIVACY", ro: "CONFIDENȚIALITATE" },
+  "st.account": { en: "ACCOUNT", ro: "CONT" },
+  "st.signOut": { en: "Sign out", ro: "Deconectare" },
+  "st.saveKeys": { en: "Save keys", ro: "Salvează cheile" },
+  "st.keysSaved": { en: "Keys saved on this device ✓", ro: "Chei salvate pe dispozitiv ✓" },
+  "st.keysNote": {
+    en: "Keys are stored only on this device (localStorage) and flip the matching service from labelled demo data to live data. Leave any key blank — the app keeps working.",
+    ro: "Cheile stau doar pe acest dispozitiv (localStorage) și comută serviciul respectiv de pe date demo etichetate pe date live. Poți lăsa orice cheie goală — aplicația funcționează oricum.",
+  },
+  "st.privacyNote": {
+    en: "Trips, expenses, documents and journal entries live on this device (and sync to your own Supabase project when configured). Trippa never processes payments — bookings hand off to trusted partners. Affiliate markers are public by design.",
+    ro: "Călătoriile, cheltuielile, documentele și jurnalul stau pe acest dispozitiv (și se sincronizează cu proiectul tău Supabase când e configurat). Trippa nu procesează plăți — rezervările merg la parteneri de încredere. Markerele de afiliere sunt publice prin design.",
+  },
+};
+
+export function getLang(): Lang {
+  const saved = store.get<Lang | null>("lang", null);
+  if (saved === "en" || saved === "ro") return saved;
+  if (typeof navigator !== "undefined" && navigator.language?.toLowerCase().startsWith("ro"))
+    return "ro";
+  return "en";
+}
+
+export function setLang(l: Lang) {
+  store.set("lang", l);
+}
+
+/** Translate hook — re-renders when the language changes.
+    Server/hydration snapshot is always "en" so prerendered HTML matches the
+    first client render; the real language kicks in right after hydration. */
+export function useT() {
+  const lang = useSyncExternalStore(
+    store.subscribe,
+    () => getLang(),
+    () => "en" as Lang
+  );
+  return (key: string): string => dict[key]?.[lang] ?? dict[key]?.en ?? key;
+}

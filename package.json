@@ -2,14 +2,21 @@
   "name": "trippa",
   "version": "1.0.0",
   "private": true,
-  "description": "Trippa — AI travel concierge. Mobile-first PWA built with Next.js, TypeScript, Tailwind and Supabase.",
+  "description": "Trippa \u2014 AI travel concierge. Mobile-first PWA built with Next.js, TypeScript, Tailwind and Supabase.",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "mobile:sync": "cap sync",
+    "mobile:android": "cap open android",
+    "mobile:ios": "cap open ios"
   },
   "dependencies": {
+    "@capacitor/android": "^8.4.1",
+    "@capacitor/cli": "^8.4.1",
+    "@capacitor/core": "^8.4.1",
+    "@capacitor/ios": "^8.4.1",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.417.0",
     "next": "^14.2.5",

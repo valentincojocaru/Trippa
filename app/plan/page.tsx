@@ -29,6 +29,7 @@ import { toast } from "@/components/Toast";
 import { destinationService } from "@/lib/services/destinationService";
 import { trending, popular } from "@/data/destinations";
 import DestImage from "@/components/DestImage";
+import { useT } from "@/lib/i18n";
 import { generateTrip } from "@/lib/tripGenerator";
 import { tripService } from "@/lib/services/userService";
 import { PLAN_DEFAULTS, type PlanState } from "@/lib/types";
@@ -50,6 +51,7 @@ function priceTier(d: Date): 0 | 1 | 2 {
 
 export default function PlanPage() {
   const router = useRouter();
+  const t = useT();
   const [S, setS] = useState<PlanState>(PLAN_DEFAULTS);
   const [phase, setPhase] = useState<Phase>({ kind: "step", i: 0 });
   const [calOffset, setCalOffset] = useState(0);
@@ -85,13 +87,13 @@ export default function PlanPage() {
   /* ------------ required-info checklist (gates Generate) ------------ */
   const reqs = useMemo(
     () => [
-      { k: "Departure", ok: (S.origin || "").trim().length > 1, idx: 0 },
-      { k: "Destination", ok: S.surprise || (S.dest || "").trim().length > 1, idx: 0 },
-      { k: "Dates", ok: !!S.depart, idx: 1 },
-      { k: "Travelers", ok: (S.adults || 0) > 0, idx: 2 },
-      { k: "Budget", ok: (S.budgetTotal || 0) > 0, idx: 3 },
+      { k: t("wz.departure"), ok: (S.origin || "").trim().length > 1, idx: 0 },
+      { k: t("rv.destination"), ok: S.surprise || (S.dest || "").trim().length > 1, idx: 0 },
+      { k: t("rv.dates"), ok: !!S.depart, idx: 1 },
+      { k: t("rv.travelers"), ok: (S.adults || 0) > 0, idx: 2 },
+      { k: t("rv.budget"), ok: (S.budgetTotal || 0) > 0, idx: 3 },
     ],
-    [S]
+    [S, t] // eslint-disable-line react-hooks/exhaustive-deps
   );
   const missing = reqs.filter((r) => !r.ok);
   const ready = missing.length === 0;
@@ -125,7 +127,7 @@ export default function PlanPage() {
     patch(p);
   }
   function dateSummary(): string {
-    if (!S.depart) return "Select dates";
+    if (!S.depart) return t("wz.selectDates");
     const f = (x: Date) => x.toLocaleDateString("en-US", { day: "numeric", month: "short" });
     const d1 = parseISO(S.depart);
     if (S.tripType !== "round") return f(d1);
@@ -150,7 +152,7 @@ export default function PlanPage() {
   function goNext() {
     if (phase.kind !== "step") return;
     if (!stepValid(phase.i)) {
-      toast("Please complete this step");
+      toast(t("wz.completeStep"));
       return;
     }
     if (phase.i + 1 >= STEP_COUNT) setPhase({ kind: "review" });
@@ -197,30 +199,30 @@ export default function PlanPage() {
           <div className="wz-ic tap" onClick={goPrev}>
             <ChevronLeft size={17} strokeWidth={2.2} />
           </div>
-          <b className="text-[15px]">Review &amp; confirm</b>
+          <b className="text-[15px]">{t("rv.title")}</b>
           <span style={{ width: 38 }} />
         </div>
         <div className="flex-1 px-5 pt-[14px]" style={{ paddingBottom: 130 }}>
           <h1 className="text-[25px] tracking-[-0.02em]">
-            {S.surprise ? "Surprise destination ✨" : S.dest || "Your trip"}
+            {S.surprise ? t("rv.surpriseDest") : S.dest || t("rv.yourTrip")}
           </h1>
           <p className="muted text-[13.5px] mt-1">
-            {S.days} days · {S.tier} · {travelers}
+            {S.days} {t("rv.days")} · {S.tier} · {travelers}
           </p>
           <div className="mt-[18px]">
-            {row("Destination", S.surprise ? "Surprise me" : S.dest, 0)}
+            {row(t("rv.destination"), S.surprise ? t("rv.surpriseMe") : S.dest, 0)}
             {row(
-              "Dates",
+              t("rv.dates"),
               (S.depart || "flexible") + (S.ret ? " → " + S.ret : "") + ` · ${S.flex === "exact" ? "exact" : S.flex === "p3" ? "±3d" : "±7d"}`,
               1
             )}
-            {row("Travelers", travelers, 2)}
-            {row("Budget", `€${S.budgetTotal.toLocaleString()}${S.perPerson ? " pp" : ""} · ${S.tier}`, 3)}
+            {row(t("rv.travelers"), travelers, 2)}
+            {row(t("rv.budget"), `€${S.budgetTotal.toLocaleString()}${S.perPerson ? " pp" : ""} · ${S.tier}`, 3)}
           </div>
           <div className="wz-hint mt-4">
-            ✨ Trippa will find the best flights &amp; stays, build a day-by-day plan, and estimate your full budget.
+            {t("rv.hint")}
           </div>
-          <div className="dim text-[11px] tracking-[0.1em] mt-5 mb-[9px]">REQUIRED INFO</div>
+          <div className="dim text-[11px] tracking-[0.1em] mt-5 mb-[9px]">{t("rv.required")}</div>
           <div className="rv-checklist">
             {reqs.map((r) => (
               <div key={r.k} className="rv-chk tap" onClick={() => setPhase({ kind: "step", i: r.idx })}>
@@ -238,7 +240,7 @@ export default function PlanPage() {
               className="wz-hint mt-3"
               style={{ background: "rgba(219,39,119,.08)", borderColor: "rgba(219,39,119,.22)", color: "var(--text)" }}
             >
-              Please complete: <b>{missing.map((m) => m.k).join(", ")}</b> before generating.
+              {t("rv.missing")}: <b>{missing.map((m) => m.k).join(", ")}</b> {t("rv.beforeGen")}
             </div>
           )}
         </div>
@@ -251,7 +253,7 @@ export default function PlanPage() {
               setPhase({ kind: "processing" });
             }}
           >
-            ✨ Generate my trip <ArrowRight size={18} strokeWidth={2.2} />
+            {t("rv.generate")} <ArrowRight size={18} strokeWidth={2.2} />
           </button>
         </div>
       </div>
@@ -261,11 +263,11 @@ export default function PlanPage() {
   /* =============== steps =============== */
   const stepIdx = phase.i;
   const titles: [string, string][] = [
-    ["Where to?", "Search any city — or let Trippa surprise you."],
-    ["When?", "Pick your dates. We calculate the rest."],
-    ["Who's going?", "Your travel party."],
-    ["Budget", "Set your spend — Trippa plans within it."],
-    ["Luggage", "What are you bringing along?"],
+    [t("wz.t1"), t("wz.s1")],
+    [t("wz.t2"), t("wz.s2")],
+    [t("wz.t3"), t("wz.s3")],
+    [t("wz.t4"), t("wz.s4")],
+    [t("wz.t5"), t("wz.s5")],
   ];
   const pct = Math.round((stepIdx / STEP_COUNT) * 100);
 
@@ -316,7 +318,7 @@ export default function PlanPage() {
 
       <div className="wz-footer">
         <button className="wz-next tap" disabled={!stepValid(stepIdx)} onClick={goNext}>
-          {stepIdx === STEP_COUNT - 1 ? "Review trip" : "Continue"}
+          {stepIdx === STEP_COUNT - 1 ? t("wz.reviewTrip") : t("wz.continue")}
           <ArrowRight size={18} strokeWidth={2.2} />
         </button>
       </div>
@@ -336,6 +338,7 @@ function StepDestination({
   destQuery: string;
   setDestQuery: (s: string) => void;
 }) {
+  const t = useT();
   const results = destQuery.trim() ? destinationService.searchSync(destQuery) : [];
   const pick = (city: string) => {
     setDestQuery(city);
@@ -347,7 +350,7 @@ function StepDestination({
         <Search className="wz-search-ic" size={20} strokeWidth={2} />
         <input
           className="wz-search-in"
-          placeholder="Where do you want to go?"
+          placeholder={t("wz.searchPh")}
           value={destQuery}
           autoComplete="off"
           onChange={(e) => {
@@ -391,20 +394,20 @@ function StepDestination({
       ) : (
         <>
           <div className="wz-field">
-            <label>Flying from</label>
+            <label>{t("wz.flyingFrom")}</label>
             <input
               className="wz-input"
-              placeholder="Your city or airport — e.g. Bucharest (OTP)"
+              placeholder={t("wz.flyingFromPh")}
               value={S.origin}
               onChange={(e) => patch({ origin: e.target.value })}
             />
           </div>
-          <div className="wz-lab">TRIP TYPE</div>
+          <div className="wz-lab">{t("wz.tripType")}</div>
           <div className="wz-chips">
             {(
               [
-                ["round", "Round trip"],
-                ["oneway", "One-way"],
+                ["round", t("wz.round")] as const,
+                ["oneway", t("wz.oneway")] as const,
               ] as const
             ).map(([v, l]) => (
               <button key={v} className={"wz-chip" + (S.tripType === v ? " on" : "")} onClick={() => patch({ tripType: v })}>
@@ -417,12 +420,12 @@ function StepDestination({
               ✨
             </span>
             <div className="flex-1">
-              <b className="text-[14px]">Surprise me</b>
-              <div className="dim text-[11.5px]">Let AI choose a destination for your vibe &amp; budget</div>
+              <b className="text-[14px]">{t("wz.surprise")}</b>
+              <div className="dim text-[11.5px]">{t("wz.surpriseSub")}</div>
             </div>
             <span className={"wz-tg-box" + (S.surprise ? " on" : "")} />
           </div>
-          <div className="wz-lab">🔥 TRENDING NOW</div>
+          <div className="wz-lab">{t("wz.trendingNow")}</div>
           <div className="wz-dchips">
             {trending.map((d) => (
               <button key={d.city} className="wz-dchip tap" onClick={() => pick(d.city)}>
@@ -431,7 +434,7 @@ function StepDestination({
               </button>
             ))}
           </div>
-          <div className="wz-lab">⭐ POPULAR THIS MONTH</div>
+          <div className="wz-lab">{t("wz.popularMonth")}</div>
           <div className="wz-dchips">
             {popular.map((d) => (
               <button key={d.city} className="wz-dchip tap" onClick={() => pick(d.city)}>
@@ -444,10 +447,10 @@ function StepDestination({
       )}
       {results.length > 0 && (
         <div className="wz-field">
-          <label>Flying from</label>
+          <label>{t("wz.flyingFrom")}</label>
           <input
             className="wz-input"
-            placeholder="Your city or airport — e.g. Bucharest (OTP)"
+            placeholder={t("wz.flyingFromPh")}
             value={S.origin}
             onChange={(e) => patch({ origin: e.target.value })}
           />
@@ -475,6 +478,7 @@ function StepDates({
   setRange: (o: number, n: number) => void;
   dateSummary: () => string;
 }) {
+  const t = useT();
   const base = new Date();
   base.setDate(1);
   base.setMonth(base.getMonth() + calOffset);
@@ -521,16 +525,16 @@ function StepDates({
             setRange(add, 2);
           }}
         >
-          <b>Weekend</b>
-          <span>Fri → Sun</span>
+          <b>{t("wz.weekend")}</b>
+          <span>{t("wz.friSun")}</span>
         </button>
         <button className="wz-qbtn tap" onClick={() => setRange(14, 7)}>
-          <b>One week</b>
-          <span>7 nights</span>
+          <b>{t("wz.oneWeek")}</b>
+          <span>{t("wz.nights7")}</span>
         </button>
         <button className="wz-qbtn tap" onClick={() => setRange(21, 14)}>
-          <b>Two weeks</b>
-          <span>14 nights</span>
+          <b>{t("wz.twoWeeks")}</b>
+          <span>{t("wz.nights14")}</span>
         </button>
       </div>
 
@@ -553,24 +557,24 @@ function StepDates({
         <div className="wz-cal-legend">
           <span>
             <i className="wz-pdot t0" />
-            Cheap
+            {t("wz.cheap")}
           </span>
           <span>
             <i className="wz-pdot t1" />
-            Average
+            {t("wz.average")}
           </span>
           <span>
             <i className="wz-pdot t2" />
-            Pricey
+            {t("wz.pricey")}
           </span>
         </div>
       </div>
 
-      <div className="wz-lab">FLEXIBILITY</div>
+      <div className="wz-lab">{t("wz.flex")}</div>
       <div className="wz-chips">
         {(
           [
-            ["exact", "Exact"],
+            ["exact", t("wz.exact")] as const,
             ["p3", "±3 days"],
             ["p7", "±7 days"],
           ] as const
@@ -583,7 +587,7 @@ function StepDates({
 
       <div className="wz-daysbox">
         <div>
-          <span className="dim text-[12px]">{S.tripType === "round" ? "Trip length" : "Departure"}</span>
+          <span className="dim text-[12px]">{S.tripType === "round" ? t("wz.tripLength") : t("wz.departure")}</span>
           <div className="text-[22px] font-bold mt-[1px]">{dateSummary()}</div>
         </div>
         <span className={"wz-cal-dot" + (S.depart ? " ok" : "")}>{S.depart ? "✓" : ""}</span>
@@ -591,8 +595,8 @@ function StepDates({
       <div className="wz-hint">
         💡{" "}
         {S.flex === "exact"
-          ? "Green dots mark the cheapest days to fly."
-          : "We'll scan nearby dates and flag cheaper options automatically."}
+          ? t("wz.hintExact")
+          : t("wz.hintFlex")}
       </div>
     </>
   );
@@ -600,6 +604,7 @@ function StepDates({
 
 /* ================= step 3 — travelers + pets ================= */
 function StepTravelers({ S, patch }: { S: PlanState; patch: (p: Partial<PlanState>) => void }) {
+  const t = useT();
   const TINT: Record<string, [string, string]> = {
     adults: ["rgba(37,99,235,.1)", "var(--accent)"],
     children: ["rgba(22,163,74,.12)", "var(--green)"],
@@ -633,11 +638,11 @@ function StepTravelers({ S, patch }: { S: PlanState; patch: (p: Partial<PlanStat
 
   return (
     <>
-      {trav("adults", "Adults", "13+ years", "🧑", 1, 12)}
-      {trav("children", "Children", "2–12 years", "🧒", 0, 10)}
+      {trav("adults", t("wz.adults"), t("wz.adultsSub"), "🧑", 1, 12)}
+      {trav("children", t("wz.children"), t("wz.childrenSub"), "🧒", 0, 10)}
       {S.children > 0 && (
         <div className="wz-field">
-          <label>Ages of children</label>
+          <label>{t("wz.childAges")}</label>
           <input
             className="wz-input"
             placeholder="e.g. 4, 7, 11"
@@ -648,19 +653,19 @@ function StepTravelers({ S, patch }: { S: PlanState; patch: (p: Partial<PlanStat
           />
         </div>
       )}
-      {trav("infants", "Infants", "Under 2", "👶", 0, 6)}
-      {trav("seniors", "Seniors", "65+ years", "🧓", 0, 8)}
+      {trav("infants", t("wz.infants"), t("wz.infantsSub"), "👶", 0, 6)}
+      {trav("seniors", t("wz.seniors"), t("wz.seniorsSub"), "🧓", 0, 8)}
 
-      <div className="wz-lab">PETS</div>
+      <div className="wz-lab">{t("wz.pets")}</div>
       <div className={"wz-pet-card" + (S.pets === "yes" ? " on" : "")}>
         <div className="wz-pet-head tap" onClick={() => patch({ pets: S.pets === "yes" ? "no" : "yes" })}>
           <span className="wz-trav-ic" style={{ background: "rgba(124,92,255,.12)", color: "var(--purple)", fontSize: 20 }}>
             🐾
           </span>
           <div className="flex-1">
-            <b className="text-[14.5px]">Travelling with pets</b>
+            <b className="text-[14.5px]">{t("wz.withPets")}</b>
             <div className="dim text-[11.5px]">
-              {S.pets === "yes" ? "We'll only show pet-friendly stays 🐾" : "Tap to add your furry companions"}
+              {S.pets === "yes" ? t("wz.petsOn") : t("wz.petsOff")}
             </div>
           </div>
           <span className={"wz-tg-box" + (S.pets === "yes" ? " on" : "")} />
@@ -682,7 +687,7 @@ function StepTravelers({ S, patch }: { S: PlanState; patch: (p: Partial<PlanStat
               ))}
             </div>
             <div className="wz-count">
-              <b className="text-[14.5px]">Number of pets</b>
+              <b className="text-[14.5px]">{t("wz.petCount")}</b>
               <div className="wz-stepper">
                 <button className="wz-mn tap" disabled={S.petCount <= 1} onClick={() => patch({ petCount: Math.max(1, S.petCount - 1) })}>
                   −
@@ -710,6 +715,7 @@ function StepBudget({
   patch: (p: Partial<PlanState>) => void;
   budgetTip: () => string;
 }) {
+  const t = useT();
   const tiers = [
     { v: "Budget", e: "💸", d: "Smart & affordable" },
     { v: "Comfort", e: "⭐", d: "Great value picks" },
@@ -729,7 +735,7 @@ function StepBudget({
       </div>
       <div className="wz-budget-box">
         <div className="flex items-center justify-between">
-          <span className="dim text-[12.5px]">{S.perPerson ? "Per person" : "Total budget"}</span>
+          <span className="dim text-[12.5px]">{S.perPerson ? t("wz.perPerson") : t("wz.totalBudget")}</span>
           <b className="t-acc text-[21px]">€{(S.budgetTotal || 0).toLocaleString()}</b>
         </div>
         <input
@@ -748,15 +754,15 @@ function StepBudget({
       </div>
       <div className="wz-tg tap" onClick={() => patch({ perPerson: !S.perPerson })}>
         <div>
-          <b className="text-[14px]">Budget is per person</b>
-          <div className="dim text-[11.5px]">Otherwise total for the whole party</div>
+          <b className="text-[14px]">{t("wz.perPersonTg")}</b>
+          <div className="dim text-[11.5px]">{t("wz.perPersonSub")}</div>
         </div>
         <span className={"wz-tg-box" + (S.perPerson ? " on" : "")} />
       </div>
       <div className="wz-aitip">
         <span className="text-[18px]">✨</span>
         <div>
-          <b className="text-[12.5px]">Trippa tip</b>
+          <b className="text-[12.5px]">{t("wz.tip")}</b>
           <div className="dim text-[12px] leading-[1.4] mt-[1px]">{budgetTip()}</div>
         </div>
       </div>
@@ -766,6 +772,7 @@ function StepBudget({
 
 /* ================= step 5 — luggage ================= */
 function StepLuggage({ S, patch }: { S: PlanState; patch: (p: Partial<PlanState>) => void }) {
+  const t = useT();
   const bag = (k: "personal" | "cabin" | "checked", label: string, sub: string, emoji: string) => {
     const on = !!S.bags[k];
     return (
@@ -799,13 +806,13 @@ function StepLuggage({ S, patch }: { S: PlanState; patch: (p: Partial<PlanState>
   return (
     <>
       <div className="wz-bags">
-        {bag("personal", "Personal item", "Bag under the seat", "👜")}
-        {bag("cabin", "Cabin bag", "Overhead carry-on", "🎒")}
-        {bag("checked", "Checked bag", "Goes in the hold", "🧳")}
+        {bag("personal", t("wz.personal"), t("wz.personalSub"), "👜")}
+        {bag("cabin", t("wz.cabin"), t("wz.cabinSub"), "🎒")}
+        {bag("checked", t("wz.checked"), t("wz.checkedSub"), "🧳")}
       </div>
       {S.bags.checked && (
         <div className="wz-count">
-          <b className="text-[14.5px]">Checked bags per traveler</b>
+          <b className="text-[14.5px]">{t("wz.bagsPer")}</b>
           <div className="wz-stepper">
             <button className="wz-mn tap" disabled={S.bagsPer <= 1} onClick={() => patch({ bagsPer: Math.max(1, S.bagsPer - 1) })}>
               −
@@ -817,10 +824,10 @@ function StepLuggage({ S, patch }: { S: PlanState; patch: (p: Partial<PlanState>
           </div>
         </div>
       )}
-      <div className="wz-lab">EXTRAS</div>
+      <div className="wz-lab">{t("wz.extras")}</div>
       <div className="wz-bags two">
-        {extra("sports", "Sports gear", "Skis, golf, surf", "⛷️")}
-        {extra("oversized", "Oversized", "Instruments, strollers", "🎸")}
+        {extra("sports", t("wz.sports"), t("wz.sportsSub"), "⛷️")}
+        {extra("oversized", t("wz.oversized"), t("wz.oversizedSub"), "🎸")}
       </div>
     </>
   );
@@ -829,7 +836,8 @@ function StepLuggage({ S, patch }: { S: PlanState; patch: (p: Partial<PlanState>
 /* ================= processing (AI live steps) ================= */
 function Processing({ S }: { S: PlanState }) {
   const router = useRouter();
-  const [stepText, setStepText] = useState("Talking to Trippa AI…");
+  const t = useT();
+  const [stepText, setStepText] = useState(t("px.talking"));
   const [idx, setIdx] = useState(0);
   const [error, setError] = useState<null | "no-key" | "generic">(null);
   const startedRef = useRef(false);
@@ -837,17 +845,17 @@ function Processing({ S }: { S: PlanState }) {
   const steps = useMemo(() => {
     const hasPets = S.pets === "yes";
     return [
-      { ic: "✈️", t: "Finding the best flights" },
-      { ic: "🏨", t: "Searching top-rated hotels" },
-      ...(hasPets ? [{ ic: "🐶", t: "Filtering pet-friendly stays" }] : []),
-      { ic: "📍", t: "Building the perfect route" },
-      { ic: "🍜", t: "Picking great restaurants" },
-      { ic: "🌤", t: "Checking the weather" },
-      { ic: "💶", t: "Optimizing your budget" },
-      { ic: "🧳", t: "Creating your packing list" },
-      { ic: "✨", t: "Putting it all together" },
+      { ic: "✈️", t: t("px.flights") },
+      { ic: "🏨", t: t("px.hotels") },
+      ...(hasPets ? [{ ic: "🐶", t: t("px.petFilter") }] : []),
+      { ic: "📍", t: t("px.route") },
+      { ic: "🍜", t: t("px.food") },
+      { ic: "🌤", t: t("px.weather") },
+      { ic: "💶", t: t("px.budget") },
+      { ic: "🧳", t: t("px.packing") },
+      { ic: "✨", t: t("px.together") },
     ];
-  }, [S.pets]);
+  }, [S.pets, t]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (startedRef.current) return;
@@ -863,7 +871,7 @@ function Processing({ S }: { S: PlanState }) {
         const trip = await generateTrip(S, { withActivities: true }, setStepText);
         clearInterval(iv);
         setIdx(n - 1);
-        setStepText("Saving your trip…");
+        setStepText(t("px.saving"));
         tripService.save(trip);
         tripService.activate(trip);
         setTimeout(() => router.replace("/trip/" + trip.id), 350);
@@ -885,18 +893,16 @@ function Processing({ S }: { S: PlanState }) {
         >
           ⚠️
         </div>
-        <b className="text-[17px] mt-4">{error === "no-key" ? "Add your AI key" : "Couldn't build that trip"}</b>
+        <b className="text-[17px] mt-4">{error === "no-key" ? t("px.noKeyTitle") : t("px.failTitle")}</b>
         <div className="muted text-[13px] mt-[6px] max-w-[260px]">
-          {error === "no-key"
-            ? "To plan AI trips, paste your OpenAI or Anthropic key in Settings — it stays only on your device."
-            : "The planner needs a connection. Check you're online and try again."}
+          {error === "no-key" ? t("px.noKeyBody") : t("px.failBody")}
         </div>
         <button
           className="btn btn-primary tap mt-[18px]"
           style={{ maxWidth: 220 }}
           onClick={() => router.push(error === "no-key" ? "/settings" : "/plan")}
         >
-          {error === "no-key" ? "Open Settings" : "Try again"}
+          {error === "no-key" ? t("px.openSettings") : t("px.tryAgain")}
         </button>
       </div>
     );
@@ -920,7 +926,7 @@ function Processing({ S }: { S: PlanState }) {
           </span>
         </div>
         <b className="text-[19px] mt-6 tracking-[-0.02em]">
-          Planning your trip{dest ? ` to ${String(dest).split(",")[0]}` : ""}
+          {t("px.planning")}{dest ? ` ${t("px.to")} ${String(dest).split(",")[0]}` : ""}
         </b>
         <div className="muted text-[13px] mt-[5px] min-h-[18px]">{stepText}</div>
         <div className="ai-prog2">
