@@ -320,7 +320,7 @@ export default function TripResultsPage() {
         </div>
 
         {/* good to know */}
-        {(trip.bestTime || trip.weather || trip.transport) && (
+        {(trip.bestTime || trip.weather || trip.transport || trip.visa) && (
           <>
             <div className="rs-sec">{t("rs.goodToKnow")}</div>
             <div className="card p-[15px] flex flex-col gap-[10px]">
@@ -348,6 +348,15 @@ export default function TripResultsPage() {
                   <div>
                     <b className="text-[13px]">{t("rs.transport")}</b>
                     <div className="dim text-[12px]">{trip.transport}</div>
+                  </div>
+                </div>
+              )}
+              {trip.visa && (
+                <div className="rs-fact">
+                  <span>🛂</span>
+                  <div>
+                    <b className="text-[13px]">{t("rs.visa")}</b>
+                    <div className="dim text-[12px]">{trip.visa}</div>
                   </div>
                 </div>
               )}

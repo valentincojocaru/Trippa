@@ -224,6 +224,27 @@ const dict: Record<string, { en: string; ro: string }> = {
   "px.openSettings": { en: "Open Settings", ro: "Deschide Setările" },
   "px.tryAgain": { en: "Try again", ro: "Încearcă din nou" },
 
+  /* agents + replan */
+  "ag.planner": { en: "Planner agent — logistics", ro: "Agent planificare — logistică" },
+  "ag.itinerary": { en: "Itinerary agent — day by day", ro: "Agent itinerariu — zi cu zi" },
+  "ag.dining": { en: "Restaurant agent", ro: "Agent restaurante" },
+  "ag.weather": { en: "Weather agent — live forecast", ro: "Agent vreme — prognoză live" },
+  "ag.budget": { en: "Budget agent — ceiling check", ro: "Agent buget — verificare plafon" },
+  "ag.packing": { en: "Packing agent", ro: "Agent bagaje" },
+  "ag.visa": { en: "Visa & entry agent", ro: "Agent vize și intrare" },
+  "ag.skipped": { en: "skipped", ro: "sărit" },
+  "rp.btn": { en: "✨ Replan this day", ro: "✨ Replanifică ziua" },
+  "rp.title": { en: "Replan the day", ro: "Replanifică ziua" },
+  "rp.reason": { en: "What changed?", ro: "Ce s-a schimbat?" },
+  "rp.rain": { en: "🌧️ Rain — indoor plan", ro: "🌧️ Plouă — plan la interior" },
+  "rp.closed": { en: "🚪 Something's closed", ro: "🚪 Ceva e închis" },
+  "rp.relaxed": { en: "🧘 Slower day", ro: "🧘 Zi mai lejeră" },
+  "rp.adventurous": { en: "🪂 More adventure", ro: "🪂 Mai multă aventură" },
+  "rp.go": { en: "Replan with AI", ro: "Replanifică cu AI" },
+  "rp.done": { en: "Day replanned ✨", ro: "Zi replanificată ✨" },
+  "rp.fail": { en: "Couldn't replan — try again", ro: "Nu am putut replanifica — încearcă iar" },
+  "rs.visa": { en: "Entry & visa", ro: "Intrare și viză" },
+
   /* results */
   "rs.yourTrip": { en: "Your Trip", ro: "Călătoria ta" },
   "rs.aiPlanned": { en: "✨ AI-planned", ro: "✨ Plan AI" },

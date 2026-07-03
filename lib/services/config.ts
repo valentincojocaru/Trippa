@@ -47,6 +47,7 @@ export const REQUIRES: Record<string, string[]> = {
   supabase: ["NEXT_PUBLIC_SUPABASE_URL", "NEXT_PUBLIC_SUPABASE_ANON_KEY"],
   openai: ["OPENAI_API_KEY"],
   anthropic: ["ANTHROPIC_API_KEY"],
+  gemini: ["GEMINI_API_KEY"],
   maps: ["NEXT_PUBLIC_GOOGLE_MAPS_API_KEY"],
   places: ["GOOGLE_PLACES_API_KEY"],
   flights: ["TRAVELPAYOUTS_API_TOKEN"],

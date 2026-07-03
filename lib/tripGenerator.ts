@@ -17,100 +17,12 @@
    ============================================================ */
 
 import { aiService } from "./services/aiService";
+import { orchestrate } from "./agents/orchestrator";
+import type { OnEvent } from "./agents";
 import { affiliateService } from "./services/affiliateService";
 import { hotelService } from "./services/hotelService";
-import { profilePromptLine } from "./travelProfile";
 import { searchDestinations, photoURL } from "@/data/destinations";
 import type { PlanState, Trip, ItineraryDay } from "./types";
-
-/* ---------------- rich prompt (port of wizard.js richPrompt) ---------------- */
-export function richPrompt(S: PlanState): string {
-  const p: string[] = [];
-  if (S.origin) p.push(`Departing from ${S.origin}.`);
-  p.push(
-    S.surprise
-      ? `Surprise me with a destination that fits the profile below.`
-      : `Destination: ${S.dest}.`
-  );
-  p.push(
-    `${S.tripType === "round" ? "Round trip" : "One-way"}, ${S.days} days` +
-      (S.depart ? `, departing ${S.depart}${S.ret ? ` returning ${S.ret}` : ""}` : "") +
-      (S.flex !== "exact"
-        ? ` (flexible ${S.flex === "p3" ? "±3" : "±7"} days — suggest cheaper nearby dates)`
-        : "") +
-      `.`
-  );
-  let trav = `${S.adults} adults`;
-  if (S.children)
-    trav += `, ${S.children} children${S.childAges.length ? ` (ages ${S.childAges.join(", ")})` : ""}`;
-  if (S.infants) trav += `, ${S.infants} infants`;
-  if (S.seniors) trav += `, ${S.seniors} seniors`;
-  p.push(`Travelers: ${trav}.`);
-  if (S.pets === "yes")
-    p.push(
-      `Travelling with ${S.petCount} ${S.petType.toLowerCase()}(s) — ONLY recommend pet-friendly accommodation.`
-    );
-  p.push(
-    `The user's budget is €${S.budgetTotal}${S.perPerson ? " per person" : " total"} (${S.tier} level). ` +
-      `Treat this as a hard constraint you must NOT change. Give realistic market-rate estimates for flights and stays; ` +
-      `if a realistic trip cannot fit this budget, still return your best honest estimate (do not lower prices to fit) ` +
-      `so the app can tell the user it is over budget and suggest alternatives.`
-  );
-  if (S.interests.length)
-    p.push(`Interests: ${S.interests.join(", ")}. Build the day plan around these.`);
-  const profileLine = profilePromptLine();
-  if (profileLine) p.push(profileLine);
-  p.push(
-    `Use realistic, well-known real places and real hotel names. Do not invent fake airline flight numbers or exact gate/seat data. ` +
-      `Also note: best time to visit, weather, recommended neighbourhoods, daily spend, and a travel-insurance tip.`
-  );
-  return p.join(" ");
-}
-
-/* ---------------- JSON extraction (tolerant, port of ai-trip.js) ---------------- */
-function extractJSON(text: string): any | null {
-  if (!text) return null;
-  const t = text.replace(/```json/gi, "").replace(/```/g, "").trim();
-  const s = t.indexOf("{"),
-    e = t.lastIndexOf("}");
-  if (s < 0 || e < 0) return null;
-  const raw = t.slice(s, e + 1);
-  const tries = [
-    raw,
-    raw.replace(/,\s*([}\]])/g, "$1"),
-    raw.replace(/,\s*([}\]])/g, "$1").replace(/[\u0000-\u001F]+/g, " "),
-    raw
-      .replace(/,\s*([}\]])/g, "$1")
-      .replace(/[\u0000-\u001F]+/g, " ")
-      .replace(/\\(?!["\\/bfnrtu])/g, ""),
-  ];
-  for (const r of tries) {
-    try {
-      return JSON.parse(r);
-    } catch {}
-  }
-  return null;
-}
-
-function parseArray(text: string): any[] | null {
-  if (!text) return null;
-  const t = text.replace(/```json/gi, "").replace(/```/g, "").trim();
-  const a = t.indexOf("["),
-    b = t.lastIndexOf("]");
-  if (a < 0 || b < 0) return null;
-  const raw = t.slice(a, b + 1);
-  for (const r of [
-    raw,
-    raw.replace(/,\s*([}\]])/g, "$1"),
-    raw.replace(/,\s*([}\]])/g, "$1").replace(/[\u0000-\u001F]+/g, " "),
-  ]) {
-    try {
-      const v = JSON.parse(r);
-      if (Array.isArray(v)) return v;
-    } catch {}
-  }
-  return null;
-}
 
 /* ---------------- geocoding (Nominatim, keyless & real) ---------------- */
 async function geocode(q: string): Promise<{ lat: number; lon: number } | null> {
@@ -140,72 +52,6 @@ async function wikiImage(name?: string): Promise<string | null> {
   } catch {
     return null;
   }
-}
-
-/* ---------------- AI generation (skeleton + chunked activities) ---------------- */
-async function generateWithAI(prompt: string, withActivities: boolean): Promise<any> {
-  const skeletonAsk = `You are Trippa's trip-planning engine. The user wrote: "${prompt}".
-Plan the LOGISTICS first: flights and accommodation. Return ONLY a raw minified single-line JSON, no backticks, no apostrophes inside strings:
-{"name":"short name","country":"country","origin":"likely departure city or empty","currency":"EUR","timezone":"Europe/Rome","bestTime":"one line","weather":"one line","transport":"one line","budgetEUR":1200,"flights":{"estEUR":350,"note":"e.g. 3h direct from London","outDate":"Mon DD","backDate":"Mon DD"},"tips":["3 short tips"],"packing":[{"group":"Essentials","items":["a","b","c"]},{"group":"Clothing","items":["a","b"]},{"group":"Tech","items":["a","b"]}],"days":[{"day":"Day 1","date":"Mon DD","city":"city"}],"hotels":[{"city":"city","name":"real hotel name","area":"neighbourhood","nights":3,"priceEUR":110,"why":"max 5 words"}]}
-Rules: number of days MUST match the request. Pick real cities and REAL hotel names. One hotel per city the trip stays in. Single minified line.`;
-
-  let meta: any = null;
-  let lastText = "";
-  for (let i = 0; i < 3 && !meta; i++) {
-    lastText = await aiService.complete(
-      i ? skeletonAsk + "\n\nReturn ONLY valid minified JSON." : skeletonAsk
-    );
-    meta = extractJSON(lastText);
-    if (meta && !meta.days) meta = null;
-  }
-  if (!meta) {
-    try {
-      const fx = await aiService.complete(
-        "Fix into ONE valid minified JSON object, same keys, complete if truncated. No backticks:\n\n" +
-          lastText.slice(0, 5000)
-      );
-      meta = extractJSON(fx);
-    } catch {}
-  }
-  if (!meta || !meta.days) throw new Error("parse");
-
-  if (withActivities) {
-    const days = meta.days;
-    const BATCH = 4;
-    for (let s = 0; s < days.length; s += BATCH) {
-      const slice = days.slice(s, s + BATCH);
-      const listing = slice
-        .map((d: any, k: number) => `${s + k + 1}. ${d.day} in ${d.city}`)
-        .join("; ");
-      const itemsAsk = `For a trip to ${meta.name || ""}, ${meta.country || ""}, give 3 real activities/places for EACH of these days: ${listing}.
-Return ONLY a raw minified single-line JSON array (no backticks, no apostrophes inside strings), one entry per day in the SAME order:
-[{"items":[{"time":"HH:MM","t":"real place or restaurant","note":"max 4 words","cat":"Sights"}]}]
-cat is one of Sights/Food/Views/Shopping/Transport/Hotel. Exactly 3 items per day, ordered morning to evening. Use REAL named places for ${meta.country || "the destination"}.`;
-      let arr: any[] | null = null;
-      let raw = "";
-      for (let i = 0; i < 2 && !arr; i++) {
-        raw = await aiService.complete(
-          i ? itemsAsk + "\n\nReturn ONLY a valid minified JSON array." : itemsAsk
-        );
-        arr = parseArray(raw);
-      }
-      if (!arr) {
-        try {
-          const fx = await aiService.complete(
-            "Fix into ONE valid minified JSON array, complete if truncated. No backticks:\n\n" +
-              raw.slice(0, 5000)
-          );
-          arr = parseArray(fx);
-        } catch {}
-      }
-      slice.forEach((d: any, k: number) => {
-        d.items = arr && arr[k] && arr[k].items ? arr[k].items : [];
-      });
-    }
-  } else {
-    meta.days.forEach((d: any) => (d.items = []));
-  }
-  return meta;
 }
 
 /* ---------------- keyless estimate engine (clearly-labelled mock) ----------------
@@ -417,6 +263,7 @@ export async function buildTrip(
     flights,
     hotels,
     itin,
+    visa: data.visa || undefined,
     packing: (data.packing || []).map((g: any) => ({
       g: g.group,
       items: (g.items || []).map((t: string) => ({ t, e: "•", d: 0 as const })),
@@ -430,13 +277,21 @@ export async function buildTrip(
 export async function generateTrip(
   S: PlanState,
   opts: { withActivities?: boolean } = {},
-  setProgress?: (t: string) => void
+  setProgress?: (t: string) => void,
+  onAgentEvent?: OnEvent
 ): Promise<Trip> {
   const hasAI = await aiService.available();
   let data: any;
   if (hasAI) {
-    setProgress?.("Planning flights & hotels…");
-    data = await generateWithAI(richPrompt(S), !!opts.withActivities);
+    setProgress?.("Coordinating AI agents…");
+    // geocode up front so the weather agent can pull a REAL forecast
+    const geo = S.surprise ? null : await geocode(S.dest);
+    data = await orchestrate(
+      S,
+      { withActivities: opts.withActivities },
+      onAgentEvent || (() => {}),
+      geo
+    );
   } else {
     setProgress?.("Building a labelled estimate plan…");
     data = generateMock(S);

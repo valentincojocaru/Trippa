@@ -20,6 +20,7 @@ import { store, useStoreVersion } from "@/lib/store";
 const KEYS: { k: string; label: string; provider: string; note: string }[] = [
   { k: "OPENAI_API_KEY", label: "OpenAI API key", provider: "openai", note: "AI trip generation & concierge" },
   { k: "ANTHROPIC_API_KEY", label: "Anthropic API key", provider: "anthropic", note: "Alternative AI provider" },
+  { k: "GEMINI_API_KEY", label: "Gemini API key", provider: "gemini", note: "Fast-tier AI routing" },
   { k: "NEXT_PUBLIC_SUPABASE_URL", label: "Supabase URL", provider: "supabase", note: "Cloud sync & auth" },
   { k: "NEXT_PUBLIC_SUPABASE_ANON_KEY", label: "Supabase anon key", provider: "supabase", note: "Cloud sync & auth" },
   { k: "TRAVELPAYOUTS_API_TOKEN", label: "Travelpayouts token", provider: "flights", note: "Live flight & hotel prices" },

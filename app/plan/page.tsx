@@ -32,6 +32,7 @@ import DestImage from "@/components/DestImage";
 import { useT } from "@/lib/i18n";
 import { track } from "@/lib/analytics";
 import { generateTrip } from "@/lib/tripGenerator";
+import type { AgentEvent, AgentName } from "@/lib/agents";
 import { tripService } from "@/lib/services/userService";
 import { PLAN_DEFAULTS, type PlanState } from "@/lib/types";
 import { iso, parseISO } from "@/lib/util";
@@ -845,13 +846,21 @@ function StepLuggage({ S, patch }: { S: PlanState; patch: (p: Partial<PlanState>
 }
 
 /* ================= processing (AI live steps) ================= */
+const AGENT_ORDER: AgentName[] = ["planner", "itinerary", "dining", "weather", "budget", "packing", "visa"];
+const AGENT_ICON: Record<AgentName, string> = {
+  planner: "🧠", flights: "✈️", hotels: "🏨", itinerary: "📍",
+  dining: "🍜", weather: "🌤", budget: "💶", packing: "🧳", visa: "🛂",
+};
+
 function Processing({ S }: { S: PlanState }) {
   const router = useRouter();
   const t = useT();
   const [stepText, setStepText] = useState(t("px.talking"));
   const [idx, setIdx] = useState(0);
   const [error, setError] = useState<null | "no-key" | "generic">(null);
+  const [agents, setAgents] = useState<Partial<Record<AgentName, AgentEvent["status"]>>>({});
   const startedRef = useRef(false);
+  const liveMode = Object.keys(agents).length > 0; // real agent events arrived
 
   const steps = useMemo(() => {
     const hasPets = S.pets === "yes";
@@ -879,7 +888,9 @@ function Processing({ S }: { S: PlanState }) {
 
     (async () => {
       try {
-        const trip = await generateTrip(S, { withActivities: true }, setStepText);
+        const trip = await generateTrip(S, { withActivities: true }, setStepText, (e) =>
+          setAgents((a) => ({ ...a, [e.agent]: e.status }))
+        );
         clearInterval(iv);
         setIdx(n - 1);
         setStepText(t("px.saving"));
@@ -945,16 +956,32 @@ function Processing({ S }: { S: PlanState }) {
           <div className="ai-prog2-fill" style={{ width: Math.round((idx / steps.length) * 100) + "%" }} />
         </div>
         <div className="ai-steps2">
-          {steps.map((s, i) => (
-            <div key={s.t} className={"ai-stp2" + (i === idx ? " active" : i < idx ? " done" : "")}>
-              <span className="ai-stp2-ic">{s.ic}</span>
-              <span className="ai-stp2-t">{s.t}</span>
-              <span className="ai-stp2-chk">
-                <Check size={13} color="#fff" strokeWidth={3} />
-              </span>
-              <span className="ai-stp2-spin" />
-            </div>
-          ))}
+          {liveMode
+            ? AGENT_ORDER.filter((a) => agents[a]).map((a) => {
+                const st = agents[a]!;
+                return (
+                  <div key={a} className={"ai-stp2" + (st === "start" ? " active" : st === "done" ? " done" : "")}>
+                    <span className="ai-stp2-ic">{AGENT_ICON[a]}</span>
+                    <span className="ai-stp2-t">{t("ag." + a)}</span>
+                    {st === "skip" && <span className="dim text-[11px]">{t("ag.skipped")}</span>}
+                    {st === "error" && <span className="text-[13px]">⚠️</span>}
+                    <span className="ai-stp2-chk">
+                      <Check size={13} color="#fff" strokeWidth={3} />
+                    </span>
+                    <span className="ai-stp2-spin" />
+                  </div>
+                );
+              })
+            : steps.map((s, i) => (
+                <div key={s.t} className={"ai-stp2" + (i === idx ? " active" : i < idx ? " done" : "")}>
+                  <span className="ai-stp2-ic">{s.ic}</span>
+                  <span className="ai-stp2-t">{s.t}</span>
+                  <span className="ai-stp2-chk">
+                    <Check size={13} color="#fff" strokeWidth={3} />
+                  </span>
+                  <span className="ai-stp2-spin" />
+                </div>
+              ))}
         </div>
       </div>
     </div>
