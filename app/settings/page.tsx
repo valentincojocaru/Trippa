@@ -14,7 +14,8 @@ import { env, setEnv, isReal } from "@/lib/services/config";
 import { userService } from "@/lib/services/userService";
 import { toast } from "@/components/Toast";
 import { useT, getLang, setLang } from "@/lib/i18n";
-import { store } from "@/lib/store";
+import { getTheme, setTheme } from "@/components/ThemeApplier";
+import { store, useStoreVersion } from "@/lib/store";
 
 const KEYS: { k: string; label: string; provider: string; note: string }[] = [
   { k: "OPENAI_API_KEY", label: "OpenAI API key", provider: "openai", note: "AI trip generation & concierge" },
@@ -31,6 +32,7 @@ const KEYS: { k: string; label: string; provider: string; note: string }[] = [
 export default function SettingsPage() {
   const router = useRouter();
   const t = useT();
+  useStoreVersion();
   const [vals, setVals] = useState<Record<string, string>>({});
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
@@ -50,6 +52,15 @@ export default function SettingsPage() {
           {(["ro", "en"] as const).map((l) => (
             <span key={l} className={getLang() === l ? "on" : ""} onClick={() => setLang(l)}>
               {l === "ro" ? "🇷🇴 Română" : "🇬🇧 English"}
+            </span>
+          ))}
+        </div>
+
+        <div className="sec-lbl mb-2">{t("st.theme")}</div>
+        <div className="seg acc mb-5">
+          {(["auto", "light", "dark"] as const).map((m) => (
+            <span key={m} className={getTheme() === m ? "on" : ""} onClick={() => setTheme(m)}>
+              {m === "auto" ? t("st.auto") : m === "light" ? t("st.light") : t("st.dark")}
             </span>
           ))}
         </div>

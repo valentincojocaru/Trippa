@@ -32,6 +32,7 @@ import { trending } from "@/data/destinations";
 import DestImage from "@/components/DestImage";
 import TripImage from "@/components/TripImage";
 import TrippaMark from "@/components/TrippaMark";
+import LiveTripCard, { tripDayIndex } from "@/components/LiveTripCard";
 import { useT } from "@/lib/i18n";
 import { activeReminderCount } from "@/lib/reminders";
 import { userService } from "@/lib/services/userService";
@@ -71,8 +72,10 @@ export default function HomePage() {
     }
   }, [router]);
 
-  const trips = store.get<Trip[]>("trips", []);
-  const activeId = store.get<string | null>("activeTripId", null);
+  // store reads gated on mount — the prerendered page has no localStorage,
+  // so reading during the first render would mismatch on hydration
+  const trips = mounted ? store.get<Trip[]>("trips", []) : [];
+  const activeId = mounted ? store.get<string | null>("activeTripId", null) : null;
   const trip = trips.find((t) => t.id === activeId) || trips[0] || null;
   const cd = useCountdown(mounted && trip?.date ? trip.date : null);
 
@@ -170,6 +173,9 @@ export default function HomePage() {
           <ArrowRight size={17} color="#fff" strokeWidth={2.4} />
         </span>
       </div>
+
+      {/* live trip mode — while the trip is actually happening */}
+      {mounted && trip && tripDayIndex(trip) != null && <LiveTripCard trip={trip} />}
 
       {/* upcoming trip hero + countdown */}
       <div className="card overflow-hidden mt-[18px]" style={{ padding: 0 }}>

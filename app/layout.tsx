@@ -3,6 +3,7 @@ import "./globals.css";
 import TabBar from "@/components/TabBar";
 import Toaster from "@/components/Toast";
 import SwRegister from "@/components/SwRegister";
+import ThemeApplier from "@/components/ThemeApplier";
 
 export const metadata: Metadata = {
   title: "Trippa — AI Travel Concierge",
@@ -28,6 +29,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <TabBar />
         <Toaster />
         <SwRegister />
+        <ThemeApplier />
       </body>
     </html>
   );

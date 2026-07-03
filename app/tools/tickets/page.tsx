@@ -10,6 +10,8 @@ import EmptyState from "@/components/EmptyState";
 import { Trash2 } from "lucide-react";
 import { store, useStoreVersion } from "@/lib/store";
 import { toast } from "@/components/Toast";
+import { aiService } from "@/lib/services/aiService";
+import { useT } from "@/lib/i18n";
 import type { Ticket } from "@/lib/types";
 
 const TIX_KIND = [
@@ -35,9 +37,60 @@ function Barcode({ seed }: { seed: string }) {
 
 export default function TicketsPage() {
   useStoreVersion();
+  const t = useT();
   const [addOpen, setAddOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
+  const [importing, setImporting] = useState(false);
   const list = store.get<Ticket[]>("tickets", []);
   const save = (d: Ticket[]) => store.set("tickets", d);
+
+  /* AI import — paste a booking confirmation email, get tickets back.
+     Extraction only: the AI copies what's in the text, never invents. */
+  async function importFromText(text: string) {
+    if (!text.trim()) return;
+    if (!(await aiService.available())) {
+      toast(t("tk.importNoKey"));
+      return;
+    }
+    setImporting(true);
+    try {
+      const ask = `Extract every booking from this confirmation text. Return ONLY a minified JSON array, no backticks:
+[{"kind":"Flight","from":"OTP","to":"CDG","fromName":"Bucharest","toName":"Paris","date":"2026-07-14","time":"14:25","seat":"12A","gate":"B4","ref":"ABC123"}]
+kind is one of Flight/Train/Hotel/Event/Bus. Use ONLY information present in the text — leave any missing field as an empty string, never invent values. For hotels put the city in "to"/"toName" and check-in date in "date". Text:
+"""${text.slice(0, 6000)}"""`;
+      const raw = await aiService.complete(ask);
+      const a = raw.indexOf("["),
+        b = raw.lastIndexOf("]");
+      let arr: any[] | null = null;
+      try {
+        arr = JSON.parse(raw.slice(a, b + 1));
+      } catch {
+        try {
+          arr = JSON.parse(raw.slice(a, b + 1).replace(/,\s*([}\]])/g, "$1"));
+        } catch {}
+      }
+      if (!arr || !Array.isArray(arr) || !arr.length) throw new Error("parse");
+      const clean: Ticket[] = arr.slice(0, 10).map((x) => ({
+        kind: ["Flight", "Train", "Hotel", "Event", "Bus"].includes(x.kind) ? x.kind : "Flight",
+        from: String(x.from || "").toUpperCase().slice(0, 4),
+        to: String(x.to || "").toUpperCase().slice(0, 4),
+        fromName: String(x.fromName || ""),
+        toName: String(x.toName || ""),
+        date: String(x.date || ""),
+        time: String(x.time || ""),
+        seat: String(x.seat || ""),
+        gate: String(x.gate || ""),
+        ref: String(x.ref || "").toUpperCase(),
+      }));
+      save([...clean, ...list]);
+      toast(`${clean.length} ${t("tk.imported")}`);
+      setImportOpen(false);
+    } catch {
+      toast(t("tk.importFail"));
+    } finally {
+      setImporting(false);
+    }
+  }
 
   return (
     <>
@@ -119,7 +172,25 @@ export default function TicketsPage() {
         <button className="btn btn-primary tap mt-4" onClick={() => setAddOpen(true)}>
           Add ticket
         </button>
+        <button className="btn btn-ghost tap mt-[10px]" disabled={importing} onClick={() => setImportOpen(true)}>
+          {importing ? "✨ …" : t("tk.import")}
+        </button>
       </div>
+
+      {importOpen && (
+        <Sheet
+          title={t("tk.importTitle")}
+          submitLabel={t("tk.importBtn")}
+          fields={[{ key: "text", label: "✉️", type: "textarea", ph: t("tk.importPh") }]}
+          onClose={(r) => {
+            if (!r) {
+              setImportOpen(false);
+              return;
+            }
+            importFromText(r.text || "");
+          }}
+        />
+      )}
 
       {addOpen && (
         <Sheet

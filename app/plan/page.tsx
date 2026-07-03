@@ -62,7 +62,12 @@ export default function PlanPage() {
   useEffect(() => {
     const draft = { ...PLAN_DEFAULTS, ...store.get<Partial<PlanState>>("wizard", {}) };
     const seed = store.get<string | null>("planSeed", null);
-    if (seed) {
+    // ?dest=City deep link from the public destination pages
+    const urlDest = new URLSearchParams(window.location.search).get("dest");
+    if (urlDest) {
+      draft.dest = urlDest;
+      draft.surprise = false;
+    } else if (seed) {
       draft.dest = seed;
       draft.surprise = false;
       store.set("planSeed", null);
