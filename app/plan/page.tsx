@@ -304,7 +304,8 @@ export default function PlanPage() {
         </div>
       </div>
 
-      <div className="flex-1 px-[18px] pt-2" style={{ paddingBottom: 120 }}>
+      {/* key remounts the step so the entrance animation replays on navigation */}
+      <div key={stepIdx} className="flex-1 px-[18px] pt-2 wz-step-in" style={{ paddingBottom: 120 }}>
         <h1 className="wz-title mt-3">{titles[stepIdx][0]}</h1>
         <p className="wz-sub">{titles[stepIdx][1]}</p>
         <div className="wz-content">
