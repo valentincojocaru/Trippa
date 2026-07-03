@@ -39,9 +39,11 @@ export default function TripsPage() {
   };
 
   const empty = (title: string, sub: string) => (
-    <div className="card p-[30px] text-center">
-      <div className="text-[34px]">🧳</div>
-      <b className="block mt-[10px] text-[15px]">{title}</b>
+    <div className="card p-[30px] text-center flex flex-col items-center">
+      <div className="itile acc" style={{ width: 64, height: 64, borderRadius: 22, fontSize: 28 }} aria-hidden>
+        🧳
+      </div>
+      <b className="block mt-3 text-[15px]">{title}</b>
       <div className="muted text-[13px] mt-[5px] leading-[1.5]">{sub}</div>
     </div>
   );
