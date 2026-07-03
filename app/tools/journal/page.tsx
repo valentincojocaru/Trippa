@@ -3,7 +3,7 @@
 /* Trip Journal — dated note + photo entries, timeline. Offline,
    photos stored as downscaled dataURLs (port of features4.js). */
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ScreenHeader from "@/components/ScreenHeader";
 import Sheet from "@/components/Sheet";
 import EmptyState from "@/components/EmptyState";
@@ -14,11 +14,15 @@ import { toast } from "@/components/Toast";
 import type { JournalEntry } from "@/lib/types";
 
 export default function JournalPage() {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   useStoreVersion();
   const [addOpen, setAddOpen] = useState(false);
   const [view, setView] = useState<string | null>(null);
   const list = [...store.get<JournalEntry[]>("journal", [])].sort((a, b) => b.t - a.t);
   const save = (d: JournalEntry[]) => store.set("journal", d);
+
+  if (!mounted) return <div className="screen-body" />;
 
   return (
     <>

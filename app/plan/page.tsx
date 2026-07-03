@@ -30,6 +30,7 @@ import { destinationService } from "@/lib/services/destinationService";
 import { trending, popular } from "@/data/destinations";
 import DestImage from "@/components/DestImage";
 import { useT } from "@/lib/i18n";
+import { track } from "@/lib/analytics";
 import { generateTrip } from "@/lib/tripGenerator";
 import { tripService } from "@/lib/services/userService";
 import { PLAN_DEFAULTS, type PlanState } from "@/lib/types";
@@ -60,7 +61,11 @@ export default function PlanPage() {
 
   /* resume draft + planSeed from home */
   useEffect(() => {
-    const draft = { ...PLAN_DEFAULTS, ...store.get<Partial<PlanState>>("wizard", {}) };
+    const profile = store.get<{ tier?: string } | null>("travelProfile", null);
+    const profiled = profile?.tier
+      ? { ...PLAN_DEFAULTS, tier: profile.tier as PlanState["tier"] }
+      : PLAN_DEFAULTS;
+    const draft = { ...profiled, ...store.get<Partial<PlanState>>("wizard", {}) };
     const seed = store.get<string | null>("planSeed", null);
     // ?dest=City deep link from the public destination pages
     const urlDest = new URLSearchParams(window.location.search).get("dest");
@@ -255,6 +260,7 @@ export default function PlanPage() {
             disabled={!ready}
             onClick={() => {
               store.set("wizardProfile", S); // keep full profile for the results dashboard
+              track("wizard_generate", { dest: S.surprise ? "surprise" : S.dest, tier: S.tier });
               setPhase({ kind: "processing" });
             }}
           >
@@ -879,6 +885,7 @@ function Processing({ S }: { S: PlanState }) {
         setStepText(t("px.saving"));
         tripService.save(trip);
         tripService.activate(trip);
+        track("trip_generated", { mock: !!trip.mock, days: trip.days, country: trip.country });
         setTimeout(() => router.replace("/trip/" + trip.id), 350);
       } catch (e: any) {
         clearInterval(iv);

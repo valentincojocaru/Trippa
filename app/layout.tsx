@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { Analytics } from "@vercel/analytics/react";
 import TabBar from "@/components/TabBar";
 import Toaster from "@/components/Toast";
 import SwRegister from "@/components/SwRegister";
@@ -30,6 +31,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Toaster />
         <SwRegister />
         <ThemeApplier />
+        <Analytics />
       </body>
     </html>
   );

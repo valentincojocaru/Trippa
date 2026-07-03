@@ -3,7 +3,7 @@
 /* Tickets & passes — flights/trains/hotels as boarding-pass cards
    with deterministic barcode, route, time, gate/seat. Offline. */
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ScreenHeader from "@/components/ScreenHeader";
 import Sheet from "@/components/Sheet";
 import EmptyState from "@/components/EmptyState";
@@ -36,6 +36,8 @@ function Barcode({ seed }: { seed: string }) {
 }
 
 export default function TicketsPage() {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   useStoreVersion();
   const t = useT();
   const [addOpen, setAddOpen] = useState(false);
@@ -91,6 +93,8 @@ kind is one of Flight/Train/Hotel/Event/Bus. Use ONLY information present in the
       setImporting(false);
     }
   }
+
+  if (!mounted) return <div className="screen-body" />;
 
   return (
     <>

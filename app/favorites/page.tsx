@@ -2,7 +2,7 @@
 
 /* Favorites — saved places wishlist (port of features2.js buildFavs). */
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ScreenHeader from "@/components/ScreenHeader";
 import Sheet from "@/components/Sheet";
 import EmptyState from "@/components/EmptyState";
@@ -12,10 +12,14 @@ import { toast } from "@/components/Toast";
 import type { Favorite } from "@/lib/types";
 
 export default function FavoritesPage() {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   useStoreVersion();
   const [addOpen, setAddOpen] = useState(false);
   const data = store.get<Favorite[]>("favs", []);
   const save = (d: Favorite[]) => store.set("favs", d);
+
+  if (!mounted) return <div className="screen-body" />;
 
   return (
     <>

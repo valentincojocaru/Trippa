@@ -67,6 +67,28 @@ const dict: Record<string, { en: string; ro: string }> = {
   "ob.days7": { en: "7 days", ro: "7 zile" },
   "ob.start": { en: "Get started", ro: "Începe" },
 
+  /* onboarding quiz */
+  "obq.title": { en: "Make it yours", ro: "Fă-l al tău" },
+  "obq.sub": {
+    en: "Three quick taps — every AI plan gets tailored to your style.",
+    ro: "Trei tap-uri rapide — fiecare plan AI se adaptează stilului tău.",
+  },
+  "obq.style": { en: "WHAT'S YOUR VIBE?", ro: "CE STIL AI?" },
+  "obq.relax": { en: "🏖️ Relax", ro: "🏖️ Relaxare" },
+  "obq.adventure": { en: "🪂 Adventure", ro: "🪂 Aventură" },
+  "obq.foodie": { en: "🍜 Foodie", ro: "🍜 Foodie" },
+  "obq.culture": { en: "🏛️ Culture", ro: "🏛️ Cultură" },
+  "obq.nature": { en: "🌲 Nature", ro: "🌲 Natură" },
+  "obq.nightlife": { en: "🌃 Nightlife", ro: "🌃 Viață de noapte" },
+  "obq.party": { en: "WHO DO YOU USUALLY TRAVEL WITH?", ro: "CU CINE CĂLĂTOREȘTI DE OBICEI?" },
+  "obq.solo": { en: "🧑 Solo", ro: "🧑 Solo" },
+  "obq.couple": { en: "💑 Couple", ro: "💑 În cuplu" },
+  "obq.family": { en: "👨‍👩‍👧 Family", ro: "👨‍👩‍👧 Familie" },
+  "obq.friends": { en: "🎉 Friends", ro: "🎉 Prieteni" },
+  "obq.tier": { en: "YOUR USUAL COMFORT LEVEL?", ro: "NIVELUL TĂU DE CONFORT?" },
+  "obq.done": { en: "Let's travel", ro: "Hai la drum" },
+  "obq.skip": { en: "Skip for now", ro: "Sari peste" },
+
   /* auth */
   "auth.welcome": { en: "Welcome aboard", ro: "Bine ai venit la bord" },
   "auth.sub": { en: "Sign in to plan your next adventure.", ro: "Autentifică-te și planifică următoarea aventură." },

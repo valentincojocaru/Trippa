@@ -10,6 +10,7 @@
 
 import { affiliate, isReal } from "./config";
 import { supabaseClient } from "./supabaseClient";
+import { track } from "@/lib/analytics";
 
 const M = () => affiliate.travelpayoutsMarker;
 
@@ -71,6 +72,12 @@ export const affiliateService = {
       if (p && p.id) userId = p.id;
     } catch {}
     const rec: AffiliateClick = { userId, ts: Date.now(), marker: M(), ...entry };
+    // the money event — a real handoff to a booking partner
+    track("book_click", {
+      provider: rec.provider,
+      bookingType: rec.bookingType,
+      destination: rec.destination || null,
+    });
     try {
       const k = "trippa.affiliate_clicks";
       const arr = JSON.parse(window.localStorage.getItem(k) || "[]");

@@ -2,7 +2,7 @@
 
 /* Pre-departure checklist (port of features2.js buildPrep). */
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ScreenHeader from "@/components/ScreenHeader";
 import Sheet from "@/components/Sheet";
 import { Check, Plus } from "lucide-react";
@@ -22,6 +22,8 @@ const PREP_DEFAULT: PrepItem[] = [
 ];
 
 export default function PrepPage() {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   useStoreVersion();
   const [addOpen, setAddOpen] = useState(false);
   const data = store.get<PrepItem[]>("prep", PREP_DEFAULT);
@@ -29,6 +31,8 @@ export default function PrepPage() {
   const done = data.filter((x) => x.d).length;
   const pct = data.length ? Math.round((done / data.length) * 100) : 0;
   const dt = daysTo(store.get<string | null>("tripDate", null));
+
+  if (!mounted) return <div className="screen-body" />;
 
   return (
     <>

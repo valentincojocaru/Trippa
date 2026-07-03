@@ -1,21 +1,110 @@
 "use client";
 
-/* Onboarding — 1-screen value prop with cinematic hero + floating
-   "itinerary ready" card. Skippable. */
+/* Onboarding — cinematic value prop + a 3-tap traveler style quiz.
+   The profile is injected into every AI prompt afterwards, so plans
+   match how this person actually travels. Both steps skippable. */
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRight, Sparkles } from "lucide-react";
 import TrippaMark from "@/components/TrippaMark";
 import { store } from "@/lib/store";
 import { useT } from "@/lib/i18n";
+import { setTravelProfile, type TravelProfile } from "@/lib/travelProfile";
 
 export default function OnboardingPage() {
   const router = useRouter();
   const t = useT();
+  const [phase, setPhase] = useState<"intro" | "quiz">("intro");
+  const [styles, setStyles] = useState<string[]>([]);
+  const [party, setParty] = useState<TravelProfile["party"]>("");
+  const [tier, setTier] = useState<TravelProfile["tier"]>("");
+
   const done = (to: string) => {
     store.set("onboarded", true);
     router.push(to);
   };
+  const finishQuiz = (save: boolean) => {
+    if (save) setTravelProfile({ styles, party, tier });
+    done("/auth");
+  };
+
+  /* ---- phase 2: traveler style quiz ---- */
+  if (phase === "quiz") {
+    const styleOpts = [
+      ["relax", t("obq.relax")],
+      ["adventure", t("obq.adventure")],
+      ["foodie", t("obq.foodie")],
+      ["culture", t("obq.culture")],
+      ["nature", t("obq.nature")],
+      ["nightlife", t("obq.nightlife")],
+    ] as const;
+    const partyOpts = [
+      ["solo", t("obq.solo")],
+      ["couple", t("obq.couple")],
+      ["family", t("obq.family")],
+      ["friends", t("obq.friends")],
+    ] as const;
+    const tiers = ["Budget", "Comfort", "Premium", "Luxury"] as const;
+
+    return (
+      <div className="screen-body" style={{ paddingBottom: 30 }}>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <TrippaMark />
+            <b className="text-[15px]">Trippa</b>
+          </div>
+          <span className="dim tap text-[13px]" onClick={() => finishQuiz(false)}>
+            {t("obq.skip")}
+          </span>
+        </div>
+
+        <h1 className="text-[26px] mt-6">{t("obq.title")}</h1>
+        <p className="muted text-[14px] mt-2 leading-[1.5]">{t("obq.sub")}</p>
+
+        <div className="wz-lab mt-6">{t("obq.style")}</div>
+        <div className="wz-chips mt-2">
+          {styleOpts.map(([k, l]) => (
+            <button
+              key={k}
+              className={"wz-chip" + (styles.includes(k) ? " on" : "")}
+              onClick={() => setStyles((s) => (s.includes(k) ? s.filter((x) => x !== k) : [...s, k]))}
+            >
+              {l}
+            </button>
+          ))}
+        </div>
+
+        <div className="wz-lab mt-5">{t("obq.party")}</div>
+        <div className="wz-chips mt-2">
+          {partyOpts.map(([k, l]) => (
+            <button key={k} className={"wz-chip" + (party === k ? " on" : "")} onClick={() => setParty(k)}>
+              {l}
+            </button>
+          ))}
+        </div>
+
+        <div className="wz-lab mt-5">{t("obq.tier")}</div>
+        <div className="wz-chips mt-2">
+          {tiers.map((k) => (
+            <button key={k} className={"wz-chip" + (tier === k ? " on" : "")} onClick={() => setTier(k)}>
+              {k}
+            </button>
+          ))}
+        </div>
+
+        <div className="mt-auto flex flex-col gap-4 pt-8">
+          <div className="flex justify-center gap-[7px]">
+            <i style={{ width: 7, height: 7, borderRadius: "50%", background: "var(--surface-2)" }} />
+            <i style={{ width: 22, height: 7, borderRadius: 4, background: "var(--accent-grad)" }} />
+          </div>
+          <button className="btn btn-primary tap" onClick={() => finishQuiz(true)}>
+            {t("obq.done")} <ArrowRight size={18} strokeWidth={2.4} />
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="screen-body" style={{ paddingBottom: 30 }}>
@@ -73,7 +162,7 @@ export default function OnboardingPage() {
           <i style={{ width: 7, height: 7, borderRadius: "50%", background: "var(--surface-2)" }} />
           <i style={{ width: 7, height: 7, borderRadius: "50%", background: "var(--surface-2)" }} />
         </div>
-        <button className="btn btn-primary tap" onClick={() => done("/auth")}>
+        <button className="btn btn-primary tap" onClick={() => setPhase("quiz")}>
           {t("ob.start")} <ArrowRight size={18} strokeWidth={2.4} />
         </button>
       </div>

@@ -3,7 +3,7 @@
 /* Travel Wallet — passport/visa/insurance/ID docs with photo and
    expiry status (green/amber/red). Offline, on-device only. */
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ScreenHeader from "@/components/ScreenHeader";
 import Sheet from "@/components/Sheet";
 import EmptyState from "@/components/EmptyState";
@@ -35,11 +35,15 @@ function expiryInfo(d: WalletDoc) {
 }
 
 export default function WalletPage() {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   useStoreVersion();
   const [addOpen, setAddOpen] = useState(false);
   const [view, setView] = useState<string | null>(null);
   const docs = store.get<WalletDoc[]>("wallet_docs", []);
   const save = (d: WalletDoc[]) => store.set("wallet_docs", d);
+
+  if (!mounted) return <div className="screen-body" />;
 
   return (
     <>

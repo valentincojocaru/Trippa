@@ -9,6 +9,7 @@ import { ArrowUp } from "lucide-react";
 import ScreenHeader from "@/components/ScreenHeader";
 import { store, useStoreVersion } from "@/lib/store";
 import { aiService } from "@/lib/services/aiService";
+import { profilePromptLine } from "@/lib/travelProfile";
 import { tripService } from "@/lib/services/userService";
 import type { ChatMsg, ItineraryDay } from "@/lib/types";
 
@@ -24,7 +25,8 @@ function persona(): string {
   const ctx = trip
     ? `The user is planning/on a trip to ${trip.name}${trip.country ? ", " + trip.country : ""} (budget ~€${trip.budget}). Currency ${trip.currency}.`
     : `The user has not planned a trip yet — you may suggest destinations, but never invent trip details they did not give you.`;
-  return `You are Trippa, a warm, expert AI travel concierge inside a mobile travel app. ${ctx}${plan} Reply in the user's language. Keep replies short and practical (2-4 sentences), concrete, friendly, with the occasional tasteful emoji. Suggest specific real places, times or tips when relevant. If asked to rearrange the itinerary, give the new order clearly.`;
+  const profile = profilePromptLine();
+  return `You are Trippa, a warm, expert AI travel concierge inside a mobile travel app. ${ctx}${plan} ${profile} Reply in the user's language. Keep replies short and practical (2-4 sentences), concrete, friendly, with the occasional tasteful emoji. Suggest specific real places, times or tips when relevant. If asked to rearrange the itinerary, give the new order clearly.`;
 }
 
 export default function ChatPage() {

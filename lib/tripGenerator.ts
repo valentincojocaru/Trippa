@@ -19,6 +19,7 @@
 import { aiService } from "./services/aiService";
 import { affiliateService } from "./services/affiliateService";
 import { hotelService } from "./services/hotelService";
+import { profilePromptLine } from "./travelProfile";
 import { searchDestinations, photoURL } from "@/data/destinations";
 import type { PlanState, Trip, ItineraryDay } from "./types";
 
@@ -57,6 +58,8 @@ export function richPrompt(S: PlanState): string {
   );
   if (S.interests.length)
     p.push(`Interests: ${S.interests.join(", ")}. Build the day plan around these.`);
+  const profileLine = profilePromptLine();
+  if (profileLine) p.push(profileLine);
   p.push(
     `Use realistic, well-known real places and real hotel names. Do not invent fake airline flight numbers or exact gate/seat data. ` +
       `Also note: best time to visit, weather, recommended neighbourhoods, daily spend, and a travel-insurance tip.`
