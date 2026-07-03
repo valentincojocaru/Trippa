@@ -106,9 +106,11 @@ export default function HomePage() {
   // computed client-side only — the page is prerendered at build time and
   // a baked-in greeting would mismatch on hydration
   const [greet, setGreet] = useState("");
+  const [greetEmoji, setGreetEmoji] = useState("");
   useEffect(() => {
     const hour = new Date().getHours();
     setGreet(hour < 12 ? t("home.morning") : hour < 18 ? t("home.afternoon") : t("home.evening"));
+    setGreetEmoji(hour < 12 ? "☀️" : hour < 18 ? "🌤️" : "🌙");
   }, []);
 
   const qa = useMemo(
@@ -160,7 +162,7 @@ export default function HomePage() {
       <div className="mt-5">
         <div className="dim text-[14px]">
           {greet}
-          {name ? `, ${name}` : ""} ☀️
+          {name ? `, ${name}` : ""} {greetEmoji}
         </div>
         <h1 className="text-[27px] mt-[3px]">{t("home.whereNext")}</h1>
       </div>

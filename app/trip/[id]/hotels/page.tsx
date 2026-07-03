@@ -13,6 +13,7 @@ import { ArrowUpRight } from "lucide-react";
 import ScreenHeader from "@/components/ScreenHeader";
 import EmptyState from "@/components/EmptyState";
 import EstimateBadge from "@/components/EstimateBadge";
+import { SkeletonList } from "@/components/Skeleton";
 import { useTrip } from "@/lib/useTrip";
 import { affiliateService } from "@/lib/services/affiliateService";
 import { hotelService } from "@/lib/services/hotelService";
@@ -157,7 +158,7 @@ export default function HotelsPage() {
 
         <div className="flex flex-col gap-3">
           {list == null ? (
-            <div className="card p-6 text-center muted text-[13px]">Finding stays in {city}…</div>
+            <SkeletonList n={3} image />
           ) : filtered.length ? (
             filtered.map((h, i) => {
               const deals = dealsFor(h, city);
