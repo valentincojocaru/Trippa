@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3E7BFF"/>
+      <stop offset="50%" stop-color="#5C5BF0"/>
+      <stop offset="100%" stop-color="#9B3FE6"/>
+    </linearGradient>
+    <radialGradient id="hl" cx="30%" cy="12%" r="95%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.32"/>
+      <stop offset="55%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="tface" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#D6E2FF"/>
+    </linearGradient>
+    <linearGradient id="trail" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0"/>
+      <stop offset="60%" stop-color="#ffffff" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="1"/>
+    </linearGradient>
+    <filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="12" stdDeviation="18" flood-color="#0B1220" flood-opacity="0.30"/>
+    </filter>
+    <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="7"/>
+    </filter>
+  </defs>
+
+  <rect width="512" height="512" fill="url(#bg)"/>
+  <rect width="512" height="512" fill="url(#hl)"/>
+  <g transform="translate(51.2 51.2) scale(0.8)">
+  
+
+  <!-- orbit trail (both ends tucked behind the T's stem) -->
+  <g transform="translate(256 300) rotate(-16)">
+    <!-- behind segment: lower-left up over the top, ending hidden behind the stem -->
+    <path d="M -170 -30 A 178 84 0 0 1 -10 -83.5" fill="none" stroke="#ffffff" stroke-opacity="0.45" stroke-width="8" stroke-linecap="round"/>
+  </g>
+
+  <!-- the T -->
+  <g filter="url(#soft)">
+    <path d="M136 128
+             h240 a26 26 0 0 1 26 26 v14 a26 26 0 0 1 -26 26 h-84
+             v186 a26 26 0 0 1 -26 26 h-20 a26 26 0 0 1 -26 -26
+             v-186 h-84 a26 26 0 0 1 -26 -26 v-14 a26 26 0 0 1 26 -26 z"
+          fill="url(#tface)"/>
+    <path d="M136 128 h240 a26 26 0 0 1 26 26 v6 H110 v-6 a26 26 0 0 1 26 -26 z" fill="#ffffff" fill-opacity="0.5"/>
+  </g>
+
+  <!-- front trail: bursts out from behind the stem, sweeps down-right up to the jet -->
+  <g transform="translate(256 300) rotate(-16)">
+    <path d="M -170 -30 A 178 84 0 0 0 152 44" fill="none" stroke="#ffffff" stroke-opacity="0.22" stroke-width="24" stroke-linecap="round" filter="url(#glow)"/>
+    <path d="M -170 -30 A 178 84 0 0 0 152 44" fill="none" stroke="url(#trail)" stroke-width="10" stroke-linecap="round"/>
+  </g>
+
+  <!-- the jet, planted on the trail end, nose up-right -->
+  <g transform="translate(404 292) rotate(42)">
+    <!-- speed streaks -->
+    <path d="M -14 34 l -34 34" stroke="#ffffff" stroke-opacity="0.55" stroke-width="9" stroke-linecap="round"/>
+    <path d="M 14 44 l -22 22" stroke="#ffffff" stroke-opacity="0.35" stroke-width="7" stroke-linecap="round"/>
+    <g transform="scale(6.6)" filter="url(#soft)">
+      <path d="M21.5 15.5v-2l-8-5V3a1.5 1.5 0 0 0-3 0v5.5l-8 5v2l8-2.5v5.5l-2 1.5V21l3.5-1 3.5 1v-1.5l-2-1.5v-5.5l8 2.5z"
+            fill="#ffffff" transform="translate(-12 -12)"/>
+    </g>
+  </g>
+
+  <!-- sparkle accent -->
+  <path d="M118 236 l5.5 14 14 5.5 -14 5.5 -5.5 14 -5.5 -14 -14 -5.5 14 -5.5 z" fill="#ffffff" fill-opacity="0.85"/>
+
+</g>
+</svg>
