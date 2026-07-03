@@ -1,6 +1,7 @@
-/* Brand mark — white paper plane in flight on the brand gradient
-   (#3E7BFF → #5C5BF0 → #9B3FE6), with a dotted trail from the
-   departure point. Matches public/logo.svg / the PWA icons. */
+/* Brand mark — premium "T" with the jet breaking out top-right, on the
+   brand gradient (#3E7BFF → #5C5BF0 → #9B3FE6). Simplified from
+   public/logo.svg for small sizes: the thin orbit trail is dropped so
+   the mark stays crisp at 15–26px. */
 
 export default function TrippaMark({ size = 15 }: { size?: number }) {
   const box = size + 11;
@@ -19,20 +20,27 @@ export default function TrippaMark({ size = 15 }: { size?: number }) {
           </linearGradient>
         </defs>
         <rect width="512" height="512" rx="140" fill="url(#tpbg)" />
-        <circle cx="118" cy="394" r="17" fill="#fff" fillOpacity="0.9" />
+        {/* the T, nudged left to make room for the jet */}
         <path
-          d="M118 394 C 190 412, 268 386, 302 306"
+          d="M112 138 h224 a26 26 0 0 1 26 26 v14 a26 26 0 0 1 -26 26 h-76 v182 a26 26 0 0 1 -26 26 h-20 a26 26 0 0 1 -26 -26 v-182 h-76 a26 26 0 0 1 -26 -26 v-14 a26 26 0 0 1 26 -26 z"
+          fill="#fff"
+        />
+        {/* trail stub + jet, top-right */}
+        <path
+          d="M306 302 C 340 292, 366 268, 380 234"
           fill="none"
           stroke="#fff"
-          strokeOpacity="0.6"
-          strokeWidth="17"
+          strokeOpacity="0.7"
+          strokeWidth="18"
           strokeLinecap="round"
-          strokeDasharray="1 44"
+          strokeDasharray="1 42"
         />
-        <g transform="translate(168 100) scale(11.4)">
-          <path d="M22 2 L2 9.3 L10.6 13.4 Z" fill="#fff" />
-          <path d="M22 2 L15 22 L10.6 13.4 Z" fill="#fff" fillOpacity="0.82" />
-          <path d="M22 2 L10.6 13.4 L11.4 16.6 Z" fill="#fff" fillOpacity="0.55" />
+        <g transform="translate(404 176) rotate(42) scale(4.6)">
+          <path
+            d="M21.5 15.5v-2l-8-5V3a1.5 1.5 0 0 0-3 0v5.5l-8 5v2l8-2.5v5.5l-2 1.5V21l3.5-1 3.5 1v-1.5l-2-1.5v-5.5l8 2.5z"
+            fill="#fff"
+            transform="translate(-12 -12)"
+          />
         </g>
       </svg>
     </span>

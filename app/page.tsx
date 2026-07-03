@@ -31,6 +31,7 @@ import { store, useStoreVersion } from "@/lib/store";
 import { trending } from "@/data/destinations";
 import DestImage from "@/components/DestImage";
 import TripImage from "@/components/TripImage";
+import TrippaMark from "@/components/TrippaMark";
 import { activeReminderCount } from "@/lib/reminders";
 import { userService } from "@/lib/services/userService";
 import { wxEmoji } from "@/lib/services/weatherService";
@@ -97,8 +98,13 @@ export default function HomePage() {
       .catch(() => {});
   }, [mounted, trip?.lat, trip?.lon]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const hour = new Date().getHours();
-  const greet = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
+  // computed client-side only — the page is prerendered at build time and
+  // a baked-in greeting would mismatch on hydration
+  const [greet, setGreet] = useState("Hello");
+  useEffect(() => {
+    const hour = new Date().getHours();
+    setGreet(hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening");
+  }, []);
 
   const qa = useMemo(
     () => [
@@ -129,8 +135,11 @@ export default function HomePage() {
         >
           <Menu size={20} strokeWidth={2} />
         </div>
-        <div className="text-[23px] font-extrabold tracking-[-0.03em]">
-          Trip<span className="t-acc">pa</span>
+        <div className="flex items-center gap-2">
+          <TrippaMark size={17} />
+          <span className="text-[23px] font-extrabold tracking-[-0.03em]">
+            Trip<span className="t-acc">pa</span>
+          </span>
         </div>
         <div
           className="itile glass tap relative"

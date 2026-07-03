@@ -909,7 +909,15 @@ function Processing({ S }: { S: PlanState }) {
         <div className="ai-hero-orb">
           <span className="ai-orb-ring" />
           <span className="ai-orb-ring" />
-          <span className="ai-orb-core">✦</span>
+          <span className="ai-orb-core">
+            {/* the brand jet, flying while the AI plans */}
+            <svg width="34" height="34" viewBox="0 0 24 24" style={{ transform: "rotate(42deg)" }}>
+              <path
+                d="M21.5 15.5v-2l-8-5V3a1.5 1.5 0 0 0-3 0v5.5l-8 5v2l8-2.5v5.5l-2 1.5V21l3.5-1 3.5 1v-1.5l-2-1.5v-5.5l8 2.5z"
+                fill="#fff"
+              />
+            </svg>
+          </span>
         </div>
         <b className="text-[19px] mt-6 tracking-[-0.02em]">
           Planning your trip{dest ? ` to ${String(dest).split(",")[0]}` : ""}
