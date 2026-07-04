@@ -130,6 +130,34 @@ export default function HomePage() {
     [t]
   );
 
+  // The dashboard is entirely localStorage-driven, so the prerendered HTML has
+  // nothing to show. Render a deterministic shell until mounted — this makes the
+  // server output and the first client render byte-identical and rules out the
+  // whole class of hydration text mismatches (React #418) this page is prone to.
+  if (!mounted) {
+    return (
+      <div className="screen-body">
+        <div className="flex items-center justify-between">
+          <div className="itile glass" style={{ width: 42, height: 42, borderRadius: 13 }} />
+          <div className="flex items-center gap-2">
+            <TrippaMark size={17} />
+            <span className="text-[23px] font-extrabold tracking-[-0.03em]">
+              Trip<span className="t-acc">pa</span>
+            </span>
+          </div>
+          <div className="itile glass" style={{ width: 42, height: 42, borderRadius: 13 }} />
+        </div>
+        <div className="skel mt-5 skel-line w60" style={{ height: 16 }} />
+        <div className="skel mt-[10px]" style={{ height: 54, borderRadius: 16 }} />
+        <div className="skel mt-[18px]" style={{ height: 168, borderRadius: 22 }} />
+        <div className="grid grid-cols-2 gap-3 mt-[14px]">
+          <div className="skel" style={{ height: 104, borderRadius: 22 }} />
+          <div className="skel" style={{ height: 104, borderRadius: 22 }} />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="screen-body">
       {/* header */}

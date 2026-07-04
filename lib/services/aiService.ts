@@ -100,7 +100,7 @@ async function completeViaAnthropic(prompt: string, key: string, tier: AiTier): 
 }
 
 async function completeViaGemini(prompt: string, key: string, tier: AiTier): Promise<string> {
-  const model = tier === "deep" ? "gemini-2.0-pro" : "gemini-2.0-flash";
+  const model = tier === "deep" ? "gemini-2.5-pro" : "gemini-2.5-flash";
   const r = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`,
     {
