@@ -8,15 +8,21 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "mobile:build": "node scripts/mobile-build.mjs",
     "mobile:sync": "cap sync",
     "mobile:android": "cap open android",
-    "mobile:ios": "cap open ios"
+    "mobile:ios": "cap open ios",
+    "mobile:assets": "capacitor-assets generate --iconBackgroundColor '#2563eb' --splashBackgroundColor '#2563eb'"
   },
   "dependencies": {
     "@capacitor/android": "^8.4.1",
+    "@capacitor/app": "^8.1.0",
     "@capacitor/cli": "^8.4.1",
     "@capacitor/core": "^8.4.1",
     "@capacitor/ios": "^8.4.1",
+    "@capacitor/keyboard": "^8.0.5",
+    "@capacitor/splash-screen": "^8.0.1",
+    "@capacitor/status-bar": "^8.0.2",
     "@vercel/analytics": "^2.0.1",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.417.0",

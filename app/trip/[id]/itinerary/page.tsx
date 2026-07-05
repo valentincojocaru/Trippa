@@ -158,7 +158,7 @@ export default function ItineraryPage() {
 
   return (
     <>
-      <ScreenHeader title="Itinerary" backHref={`/trip/${trip.id}`} />
+      <ScreenHeader title="Itinerary" backHref={`/trip/active`} />
       <div className="screen-body">
         {/* hero */}
         {trip.hero && (

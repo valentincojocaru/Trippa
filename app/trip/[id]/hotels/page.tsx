@@ -108,7 +108,7 @@ export default function HotelsPage() {
 
   return (
     <>
-      <ScreenHeader title="Hotels" backHref={`/trip/${trip.id}`} />
+      <ScreenHeader title="Hotels" backHref={`/trip/active`} />
       <div className="screen-body">
         <div className="ht-hero" style={trip.hero ? { backgroundImage: `url('${trip.hero}')` } : undefined}>
           <div className="ht-hero-ov" />

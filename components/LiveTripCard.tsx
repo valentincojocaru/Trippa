@@ -76,7 +76,7 @@ export default function LiveTripCard({ trip }: { trip: Trip }) {
                   key={i}
                   className="flex items-center gap-3 py-[7px] tap"
                   style={isNext ? { background: "var(--accent-soft)", margin: "0 -8px", padding: "7px 8px", borderRadius: 12 } : undefined}
-                  onClick={() => router.push(`/trip/${trip.id}/itinerary`)}
+                  onClick={() => router.push(`/trip/active/itinerary`)}
                 >
                   <span className="text-[12px] font-bold tabular-nums" style={{ color: isNext ? "var(--accent)" : "var(--text-3)", width: 40 }}>
                     {it.time}
@@ -92,7 +92,7 @@ export default function LiveTripCard({ trip }: { trip: Trip }) {
             <div className="muted text-[13px] py-1">{t("lt.noPlan")}</div>
           )}
           {items.length > 4 && (
-            <div className="t-acc text-[12.5px] font-semibold tap flex items-center gap-1 mt-1" onClick={() => router.push(`/trip/${trip.id}/itinerary`)}>
+            <div className="t-acc text-[12.5px] font-semibold tap flex items-center gap-1 mt-1" onClick={() => router.push(`/trip/active/itinerary`)}>
               {t("lt.todayPlan")} <ChevronRight size={14} />
             </div>
           )}
@@ -103,7 +103,7 @@ export default function LiveTripCard({ trip }: { trip: Trip }) {
           <button className="tap flex items-center justify-center gap-[6px] py-3 text-[12.5px] font-semibold" style={{ background: "none", border: "none", color: "var(--accent)", cursor: "pointer" }} onClick={() => setAddOpen(true)}>
             <Plus size={15} strokeWidth={2.4} /> {t("lt.addExpense")}
           </button>
-          <button className="tap flex items-center justify-center gap-[6px] py-3 text-[12.5px] font-semibold" style={{ background: "none", border: "none", borderLeft: "1px solid var(--border)", borderRight: "1px solid var(--border)", color: "var(--text-2)", cursor: "pointer" }} onClick={() => router.push(`/trip/${trip.id}/map`)}>
+          <button className="tap flex items-center justify-center gap-[6px] py-3 text-[12.5px] font-semibold" style={{ background: "none", border: "none", borderLeft: "1px solid var(--border)", borderRight: "1px solid var(--border)", color: "var(--text-2)", cursor: "pointer" }} onClick={() => router.push(`/trip/active/map`)}>
             <MapPin size={15} strokeWidth={2.2} /> {t("lt.map")}
           </button>
           <button className="tap flex items-center justify-center gap-[6px] py-3 text-[12.5px] font-semibold" style={{ background: "none", border: "none", color: "var(--pink)", cursor: "pointer" }} onClick={() => router.push("/tools/emergency")}>

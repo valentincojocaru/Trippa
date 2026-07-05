@@ -35,7 +35,7 @@ export default function TripsPage() {
 
   const open = (tp: Trip) => {
     tripService.activate(tp);
-    router.push("/trip/" + tp.id);
+    router.push("/trip/active"); // canonical route → resolves to the just-activated trip
   };
 
   const empty = (title: string, sub: string) => (

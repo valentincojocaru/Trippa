@@ -215,7 +215,7 @@ export default function HomePage() {
           hero={trip?.hero}
           className="relative tap"
           style={{ height: 168 }}
-          onClick={() => router.push(trip ? `/trip/${trip.id}` : "/plan")}
+          onClick={() => router.push(trip ? `/trip/active` : "/plan")}
         >
           <div className="photo-cap-ov" />
           <div className="absolute left-[14px] right-[14px] bottom-3">

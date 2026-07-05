@@ -69,7 +69,7 @@ export default function FlightsPage() {
 
   return (
     <>
-      <ScreenHeader title="Flights" backHref={`/trip/${trip.id}`} />
+      <ScreenHeader title="Flights" backHref={`/trip/active`} />
       <div className="screen-body">
         {!res ? (
           <SkeletonList n={2} />

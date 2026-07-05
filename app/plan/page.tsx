@@ -898,7 +898,9 @@ function Processing({ S }: { S: PlanState }) {
         tripService.save(trip);
         tripService.activate(trip);
         track("trip_generated", { mock: !!trip.mock, days: trip.days, country: trip.country });
-        setTimeout(() => router.replace("/trip/" + trip.id), 350);
+        // canonical in-app route is /trip/active (resolves to the active trip);
+        // this keeps the app fully static-exportable for the Capacitor bundle
+        setTimeout(() => router.replace("/trip/active"), 350);
       } catch (e: any) {
         clearInterval(iv);
         setError(/no-key/.test(e?.message || "") ? "no-key" : "generic");

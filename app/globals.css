@@ -453,7 +453,7 @@ select.tx-input { height: 50px; }
 /* floating frosted tab bar */
 .tabbar {
   position: fixed;
-  bottom: 18px;
+  bottom: calc(18px + env(safe-area-inset-bottom));
   left: 50%;
   transform: translateX(-50%);
   width: min(398px, calc(100vw - 32px));
@@ -504,7 +504,7 @@ select.tx-input { height: 50px; }
 .tab-fab:active { transform: scale(0.92) rotate(90deg); }
 .fab {
   position: fixed;
-  bottom: 100px;
+  bottom: calc(100px + env(safe-area-inset-bottom));
   left: 50%;
   transform: translateX(calc(min(430px, 100vw) / 2 - 78px));
   width: 60px;

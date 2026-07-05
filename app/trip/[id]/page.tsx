@@ -99,7 +99,7 @@ export default function TripResultsPage() {
     dateStr = new Date(trip.date).toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" });
   }
 
-  const base = `/trip/${trip.id}`;
+  const base = `/trip/active`;
   const links = [
     { href: `${base}/itinerary`, t: t("qa.itinerary"), bg: "rgba(37,99,235,.1)", c: "var(--accent)", Icon: CalendarDays },
     { href: `${base}/map`, t: t("rs.lMap"), bg: "rgba(22,163,74,.12)", c: "var(--green)", Icon: MapIcon },
