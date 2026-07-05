@@ -92,6 +92,18 @@ export async function POST(req: Request) {
           [process.env.ANTHROPIC_API_KEY, viaAnthropic],
         ];
 
+  // No key configured on the server → clear, actionable error (never a fake answer).
+  if (!providers.some(([key]) => !!key)) {
+    return NextResponse.json(
+      {
+        error: "no-key",
+        message:
+          "AI is not configured on the server. Set OPENAI_API_KEY (or ANTHROPIC_API_KEY / GEMINI_API_KEY) in the server environment.",
+      },
+      { status: 501 }
+    );
+  }
+
   let lastErr: unknown = null;
   for (const [key, call] of providers) {
     if (!key) continue;
@@ -101,6 +113,8 @@ export async function POST(req: Request) {
       lastErr = e; // fall through to the next provider
     }
   }
-  if (lastErr) return NextResponse.json({ error: String(lastErr) }, { status: 502 });
-  return NextResponse.json({ error: "no-key" }, { status: 501 });
+  return NextResponse.json(
+    { error: "ai-upstream", message: "AI provider request failed: " + String(lastErr) },
+    { status: 502 }
+  );
 }

@@ -1,45 +1,38 @@
 /* ============================================================
    Trippa — lib/services/config.ts
-   Single source of truth for API keys + mock/real mode.
+   Single source of truth for config + mock/real mode.
 
-   Resolution order for every key:
-     1) process.env / NEXT_PUBLIC_* (build inject)
-     2) localStorage 'trippa.env.KEY'  ← set in-app (Settings)
-     3) ''                            ← empty → provider stays in MOCK mode
+   Keys resolve ONLY from the environment:
+     - NEXT_PUBLIC_* : safe, public, inlined at build (URLs, map key)
+     - server-side secrets (OPENAI_API_KEY, …) : available only in the
+       Node runtime / API routes, never shipped to the client bundle.
 
-   A service runs in REAL mode only when its required key(s) resolve.
-   Otherwise it returns clearly-labelled mock data (meta.mock === true),
-   so the app is always fully usable with no invented "real" values.
+   Secrets are NEVER read from or written to the browser (no localStorage,
+   sessionStorage, IndexedDB or Capacitor storage). On the client a secret
+   simply resolves to '' and the provider stays in clearly-labelled MOCK
+   mode, so the app is always usable and no key is ever exposed.
    ============================================================ */
 
 import type { ServiceResult } from "@/lib/types";
 
-/* NEXT_PUBLIC_* keys must be referenced statically so Next.js inlines them. */
+/* NEXT_PUBLIC_* keys must be referenced statically so Next.js inlines them.
+   These are public by definition — safe to be in the client bundle. */
 const PUBLIC_ENV: Record<string, string | undefined> = {
   NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
   NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
   NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
+  NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
 };
 
 export function env(key: string): string {
   const v = PUBLIC_ENV[key];
   if (v != null && v !== "") return String(v);
+  // Server-side secrets: readable only in the Node runtime (API routes).
+  // On the client `process.env.<SECRET>` is undefined by design.
   if (typeof process !== "undefined" && process.env && process.env[key]) {
     return String(process.env[key]);
   }
-  if (typeof window !== "undefined") {
-    try {
-      const l = window.localStorage.getItem("trippa.env." + key);
-      if (l != null && l !== "") return l;
-    } catch {}
-  }
   return "";
-}
-
-export function setEnv(key: string, val: string) {
-  try {
-    window.localStorage.setItem("trippa.env." + key, val == null ? "" : String(val));
-  } catch {}
 }
 
 /* Which env keys each provider needs to leave mock mode. */

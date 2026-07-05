@@ -61,7 +61,7 @@ export default function ItineraryPage() {
 
   async function suggestActivities() {
     if (!(await aiService.available())) {
-      toast("Add your AI key in Settings");
+      toast("AI suggestions aren't available right now");
       return;
     }
     setAiBusy(true);

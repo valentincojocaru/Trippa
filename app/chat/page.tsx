@@ -1,8 +1,8 @@
 "use client";
 
-/* AI Concierge — chat with full trip context (port of features.js
-   wireChat). Without an AI key it says so honestly and points to
-   Settings — it never fakes an answer. */
+/* AI Concierge — chat with full trip context. Talks only to our own
+   /api/ai backend (server-side key); when the backend has no key it says
+   so honestly — it never fakes an answer and never holds a key itself. */
 
 import { useEffect, useRef, useState } from "react";
 import { ArrowUp, Sparkles, UtensilsCrossed, Compass, CalendarClock, Gem } from "lucide-react";
@@ -65,7 +65,7 @@ export default function ChatPage() {
       reply = await aiService.complete(persona() + "\n\nConversation so far:\n" + transcript + "\n\nWrite Trippa's next reply only.");
     } catch (e: any) {
       reply = /no-key/.test(e?.message || "")
-        ? "I need an AI key to chat — add your OpenAI or Anthropic key in Settings (it stays on your device) and I'll be right here."
+        ? "AI chat isn't available right now — it needs the server AI key configured. I can still help you navigate your trip."
         : "I'm offline right now — reconnect and I'll plan your day. Meanwhile, check your itinerary and saved places.";
     }
     setTyping(false);

@@ -107,7 +107,7 @@ function generateMock(S: PlanState): any {
     tips: [
       "Prices shown are estimates — tap any Book button for live partner prices.",
       "Mid-week departures are usually cheaper than weekends.",
-      "Add an AI key in Settings for a fully personalised day-by-day plan.",
+      "This is a smart estimate — live AI planning fills in a fully personalised day-by-day plan.",
     ],
     packing: [
       { group: "Essentials", items: ["Passport & visa docs", "Universal power adapter", "Travel insurance card"] },
