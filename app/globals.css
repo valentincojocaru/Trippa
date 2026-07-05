@@ -50,9 +50,15 @@
   text-rendering: optimizeLegibility;
 }
 
+/* ambient stage behind the centered app column — brand aurora, very low chroma */
 html,
 body {
-  background: #e9edf3; /* neutral backdrop behind the centered app column */
+  background:
+    radial-gradient(52rem 36rem at 12% -8%, rgba(62, 123, 255, 0.09), transparent 60%),
+    radial-gradient(44rem 32rem at 88% 4%, rgba(155, 63, 230, 0.07), transparent 62%),
+    radial-gradient(40rem 40rem at 50% 110%, rgba(92, 91, 240, 0.06), transparent 58%),
+    #eef1f6;
+  background-attachment: fixed;
 }
 
 body {
@@ -89,6 +95,32 @@ h3 {
   flex-direction: column;
   overflow-x: hidden;
   box-shadow: var(--shadow-lg);
+}
+/* desktop: hairline device edges so the column reads intentional, not cropped */
+@media (min-width: 480px) {
+  .app-frame {
+    border-left: 1px solid rgba(11, 18, 32, 0.06);
+    border-right: 1px solid rgba(11, 18, 32, 0.06);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.55), var(--shadow-lg);
+  }
+}
+
+/* route transition wrapper — preserves the page's direct-child flex behaviour
+   under .app-frame while cross-fading each screen in on navigation */
+.route-shell {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+@media (prefers-reduced-motion: no-preference) {
+  /* opacity-only: the vertical motion belongs to the child stagger inside
+     .screen-body — this is just a clean cross-fade layered under it */
+  .route-shell { animation: route-in 0.3s ease both; }
+}
+@keyframes route-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .screen-body {
@@ -421,7 +453,7 @@ select.tx-input { height: 50px; }
 /* floating frosted tab bar */
 .tabbar {
   position: fixed;
-  bottom: 18px;
+  bottom: calc(18px + env(safe-area-inset-bottom));
   left: 50%;
   transform: translateX(-50%);
   width: min(398px, calc(100vw - 32px));
@@ -449,11 +481,16 @@ select.tx-input { height: 50px; }
   flex: 1;
   transition: color 0.2s;
   cursor: pointer;
+  background: none;
+  border: none;
+  font-family: inherit;
+  padding: 0;
 }
 .tabbar .ico.on { color: var(--accent-2); }
 .tab-fab {
   width: 52px;
   height: 52px;
+  border: none;
   border-radius: 18px;
   background: var(--accent-grad);
   display: flex;
@@ -467,7 +504,7 @@ select.tx-input { height: 50px; }
 .tab-fab:active { transform: scale(0.92) rotate(90deg); }
 .fab {
   position: fixed;
-  bottom: 100px;
+  bottom: calc(100px + env(safe-area-inset-bottom));
   left: 50%;
   transform: translateX(calc(min(430px, 100vw) / 2 - 78px));
   width: 60px;
@@ -629,12 +666,14 @@ select.tx-input { height: 50px; }
   position: fixed;
   inset: 0;
   z-index: 200;
-  background: rgba(20, 16, 8, 0.4);
+  background: rgba(9, 13, 26, 0.44);
+  backdrop-filter: blur(6px) saturate(1.1);
+  -webkit-backdrop-filter: blur(6px) saturate(1.1);
   display: flex;
   align-items: flex-end;
   justify-content: center;
   opacity: 0;
-  transition: opacity 0.2s ease;
+  transition: opacity 0.22s ease;
 }
 .tx-overlay.on { opacity: 1; }
 .tx-sheet {
@@ -902,6 +941,14 @@ select.tx-input { height: 50px; }
   align-items: center;
   justify-content: center;
   cursor: pointer;
+}
+/* step entrance — content slides in as you move through the wizard */
+@media (prefers-reduced-motion: no-preference) {
+  .wz-step-in { animation: wzstep 0.32s cubic-bezier(0.22, 0.61, 0.36, 1) both; }
+}
+@keyframes wzstep {
+  from { opacity: 0; transform: translateX(14px); }
+  to { opacity: 1; transform: none; }
 }
 .wz-ac { display: flex; flex-direction: column; gap: 6px; margin: 4px 0 8px; animation: wzfade 0.25s ease; }
 @keyframes wzfade {
@@ -1942,3 +1989,153 @@ html[data-theme="dark"] .qa-ic {
   box-shadow: 0 6px 14px -7px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08), inset 0 0 0 1px rgba(255, 255, 255, 0.06);
 }
 html[data-theme="dark"] .qa-ic::after { background: linear-gradient(155deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0) 52%); }
+html[data-theme="dark"],
+html[data-theme="dark"] body {
+  background:
+    radial-gradient(52rem 36rem at 12% -8%, rgba(62, 123, 255, 0.1), transparent 60%),
+    radial-gradient(44rem 32rem at 88% 4%, rgba(155, 63, 230, 0.09), transparent 62%),
+    radial-gradient(40rem 40rem at 50% 110%, rgba(92, 91, 240, 0.08), transparent 58%),
+    #060a14;
+  background-attachment: fixed;
+}
+@media (min-width: 480px) {
+  html[data-theme="dark"] .app-frame {
+    border-left-color: rgba(110, 155, 255, 0.1);
+    border-right-color: rgba(110, 155, 255, 0.1);
+    box-shadow: 0 0 0 1px rgba(110, 155, 255, 0.06), var(--shadow-lg);
+  }
+}
+html[data-theme="dark"] .tx-overlay { background: rgba(2, 4, 10, 0.6); }
+
+/* ============================================================
+   Premium interaction layer
+   Hover language (fine pointers only), visible keyboard focus,
+   brand selection, skeleton shimmer, sheet grab handle, and
+   a global reduced-motion escape hatch.
+   ============================================================ */
+
+/* text selection carries the brand */
+::selection { background: rgba(37, 99, 235, 0.18); color: var(--text); }
+html[data-theme="dark"] ::selection { background: rgba(110, 155, 255, 0.32); }
+
+/* keyboard focus — never on pointer clicks, always on tab */
+:focus { outline: none; }
+:focus-visible {
+  outline: 2.5px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+.btn:focus-visible,
+.wz-next:focus-visible,
+.tx-input:focus-visible,
+.wz-input:focus-visible,
+.wz-search-in:focus-visible,
+.rs-book:focus-visible { border-radius: inherit; }
+.tabbar .ico:focus-visible { border-radius: 12px; outline-offset: -2px; }
+
+/* hover language — desktop/fine pointers only, so touch stays clean */
+@media (hover: hover) and (pointer: fine) {
+  .btn-primary:hover {
+    filter: brightness(1.07);
+    transform: translateY(-1px);
+    box-shadow: 0 12px 28px -8px var(--accent-glow), 0 1px 0 rgba(255, 255, 255, 0.25) inset;
+  }
+  .btn-ghost:hover { background: var(--surface); border-color: var(--border-2); }
+  .wz-next:not(:disabled):hover { filter: brightness(1.07); transform: translateY(-1px); }
+  .rs-book:hover { filter: brightness(1.07); transform: translateY(-1px); }
+  .mt-new:hover { filter: brightness(1.07); }
+  .tab-fab:hover { transform: scale(1.06) rotate(8deg); }
+  .tabbar .ico:hover { color: var(--text-2); }
+  .tabbar .ico.on:hover { color: var(--accent-2); }
+  .fab:hover { transform: translateX(calc(min(430px, 100vw) / 2 - 78px)) scale(1.05); }
+
+  .card.tap:hover,
+  .mt-row:hover,
+  .wz-ac-row:hover,
+  .rv-row:hover,
+  .ht-deal-row:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+    border-color: var(--border-2);
+  }
+  .mt-feat:hover .mt-feat-img { transform: scale(1.03); }
+  .ai-sugg:hover .ai-sugg-img { transform: scale(1.03); box-shadow: var(--shadow); }
+  .qa-tile:hover .qa-ic { transform: translateY(-2px); box-shadow: 0 10px 20px -8px rgba(11, 18, 32, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.7), inset 0 0 0 1px rgba(255, 255, 255, 0.35); }
+  .qa-tile:hover span { color: var(--text); }
+
+  .wz-chip:hover,
+  .ai-chip:hover,
+  .wz-dchip:hover,
+  .wz-qbtn:hover,
+  .wz-tier:hover,
+  .wz-bag:hover,
+  .wz-pet-t:hover { border-color: var(--accent); color: var(--accent); }
+  .pill:hover { border-color: var(--border-2); color: var(--text); }
+  .seg span:not(.on):hover { color: var(--text); }
+  .ht-seg:not(.on):hover { color: var(--text); }
+  .mt-tab:not(.on):hover { color: var(--text-2); }
+  .wz-cd:not(.dep):not(.ret):not(.rng):hover { background: var(--surface-2); }
+  .wz-cal-nav:hover,
+  .wz-mn:not(:disabled):hover,
+  .wz-pl:not(:disabled):hover,
+  .wz-ic:hover { border-color: var(--accent); color: var(--accent); }
+  .ic-btn:hover { background: var(--surface-2); color: var(--text-2); }
+  .lrow.tap:hover,
+  .rv-chk:hover,
+  .rs-alt:hover { background: var(--surface); }
+  .check:hover .ct { color: var(--text); }
+  .home-search:hover { border-color: var(--border-2); box-shadow: var(--shadow-sm); }
+  .tx-star:hover { transform: scale(1.15); }
+  .td-circle:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+  .rs-link:hover .rs-link-ic { transform: translateY(-2px); box-shadow: var(--shadow); }
+  .btn-ghost-sm:hover { border-color: var(--accent); color: var(--accent); }
+}
+/* let the transforms above animate smoothly */
+.mt-feat-img, .ai-sugg-img { transition: transform 0.5s cubic-bezier(0.22, 0.61, 0.36, 1), box-shadow 0.3s; }
+.mt-row, .wz-ac-row, .rv-row, .ht-deal-row, .card { transition: transform 0.22s cubic-bezier(0.22, 0.61, 0.36, 1), box-shadow 0.25s, border-color 0.2s; }
+.td-circle, .rs-link-ic { transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s; }
+.mt-feat { isolation: isolate; }
+
+/* skeleton shimmer — for images and rows while data streams in */
+.skel {
+  position: relative;
+  overflow: hidden;
+  background: var(--surface-2);
+}
+.skel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+  animation: skel-sweep 1.6s ease-in-out infinite;
+}
+html[data-theme="dark"] .skel::after {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.07), transparent);
+}
+@keyframes skel-sweep { to { transform: translateX(100%); } }
+.skel-line { height: 12px; border-radius: 6px; }
+.skel-line.w40 { width: 40%; }
+.skel-line.w60 { width: 60%; }
+.skel-line.w80 { width: 80%; }
+
+/* bottom-sheet grab handle */
+.tx-grab {
+  width: 40px;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--border-2);
+  margin: -6px auto 12px;
+}
+
+/* respect users who turn motion off */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

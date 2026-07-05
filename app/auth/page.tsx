@@ -30,7 +30,7 @@ export default function AuthPage() {
       return;
     }
     if (!sbOn) {
-      setMsg("Supabase isn't configured — continue as guest below, or add keys in Settings.");
+      setMsg("Supabase isn't configured — continue as guest below.");
       return;
     }
     setBusy(true);

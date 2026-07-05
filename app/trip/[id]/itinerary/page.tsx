@@ -16,6 +16,8 @@ import { toast } from "@/components/Toast";
 import { useTrip } from "@/lib/useTrip";
 import { store, useStoreVersion } from "@/lib/store";
 import { affiliateService } from "@/lib/services/affiliateService";
+import { replanDay, type ReplanReason } from "@/lib/agents/orchestrator";
+import { useT } from "@/lib/i18n";
 import { aiService } from "@/lib/services/aiService";
 import { tripService } from "@/lib/services/userService";
 import type { ItineraryDay, Trip } from "@/lib/types";
@@ -31,6 +33,9 @@ export default function ItineraryPage() {
     onDone: (v: Record<string, string> | null) => void;
   }>(null);
   const [aiBusy, setAiBusy] = useState(false);
+  const [replanFor, setReplanFor] = useState<number | null>(null);
+  const [replanning, setReplanning] = useState(false);
+  const t = useT();
 
   if (!mounted) return <div className="screen-body" />;
   if (!trip)
@@ -56,7 +61,7 @@ export default function ItineraryPage() {
 
   async function suggestActivities() {
     if (!(await aiService.available())) {
-      toast("Add your AI key in Settings");
+      toast("AI suggestions aren't available right now");
       return;
     }
     setAiBusy(true);
@@ -87,6 +92,26 @@ export default function ItineraryPage() {
       toast("Could not add activities");
     } finally {
       setAiBusy(false);
+    }
+  }
+
+  async function doReplan(di: number, reason: ReplanReason) {
+    if (!(await aiService.available())) {
+      toast(t("tk.importNoKey"));
+      return;
+    }
+    setReplanning(true);
+    try {
+      const items = await replanDay(trip!, di, reason);
+      const d = [...itin];
+      d[di] = { ...d[di], items: items.map((it) => ({ ...it, icon: "view" })) };
+      saveItin(d);
+      toast(t("rp.done"));
+      setReplanFor(null);
+    } catch {
+      toast(t("rp.fail"));
+    } finally {
+      setReplanning(false);
     }
   }
 
@@ -133,7 +158,7 @@ export default function ItineraryPage() {
 
   return (
     <>
-      <ScreenHeader title="Itinerary" backHref={`/trip/${trip.id}`} />
+      <ScreenHeader title="Itinerary" backHref={`/trip/active`} />
       <div className="screen-body">
         {/* hero */}
         {trip.hero && (
@@ -293,14 +318,52 @@ export default function ItineraryPage() {
                 </div>
               </div>
             ))}
-            <button className="btn-ghost-sm tap" onClick={() => openAdd(di)}>
-              <Plus size={15} strokeWidth={2.2} />
-              Add to {d.day}
-            </button>
+            <div className="flex gap-2">
+              <button className="btn-ghost-sm tap" onClick={() => openAdd(di)}>
+                <Plus size={15} strokeWidth={2.2} />
+                Add to {d.day}
+              </button>
+              <button className="btn-ghost-sm tap" style={{ color: "var(--accent)", borderColor: "rgba(37,99,235,.35)" }} onClick={() => setReplanFor(di)}>
+                {t("rp.btn")}
+              </button>
+            </div>
           </div>
         ))}
       </div>
       {sheet && <Sheet title={sheet.title} fields={sheet.fields} submitLabel={sheet.submit} onClose={sheet.onDone} />}
+      {replanFor != null && (
+        <div
+          className="tx-overlay on"
+          onClick={(e) => {
+            if (e.target === e.currentTarget && !replanning) setReplanFor(null);
+          }}
+        >
+          <div className="tx-sheet">
+            <b className="text-[16px]">{t("rp.title")}</b>
+            <div className="dim text-[12.5px] mt-1 mb-4">{t("rp.reason")}</div>
+            <div className="flex flex-col gap-[9px]">
+              {(
+                [
+                  ["rain", t("rp.rain")],
+                  ["closed", t("rp.closed")],
+                  ["relaxed", t("rp.relaxed")],
+                  ["adventurous", t("rp.adventurous")],
+                ] as [ReplanReason, string][]
+              ).map(([k, l]) => (
+                <button
+                  key={k}
+                  className="wz-chip tap"
+                  style={{ justifyContent: "flex-start" }}
+                  disabled={replanning}
+                  onClick={() => doReplan(replanFor, k)}
+                >
+                  {replanning ? "✨ …" : l}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

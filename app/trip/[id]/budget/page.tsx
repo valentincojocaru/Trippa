@@ -51,7 +51,7 @@ export default function BudgetPage() {
 
   return (
     <>
-      <ScreenHeader title="Budget" backHref={trip ? `/trip/${trip.id}` : "/"} />
+      <ScreenHeader title="Budget" backHref={trip ? `/trip/active` : "/"} />
       <div className="screen-body">
         <div className="card p-[18px]">
           <div className="flex items-center justify-between">

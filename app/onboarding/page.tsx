@@ -54,9 +54,13 @@ export default function OnboardingPage() {
             <TrippaMark />
             <b className="text-[15px]">Trippa</b>
           </div>
-          <span className="dim tap text-[13px]" onClick={() => finishQuiz(false)}>
+          <button
+            className="dim tap text-[13px]"
+            style={{ background: "none", border: "none", fontFamily: "inherit" }}
+            onClick={() => finishQuiz(false)}
+          >
             {t("obq.skip")}
-          </span>
+          </button>
         </div>
 
         <h1 className="text-[26px] mt-6">{t("obq.title")}</h1>
@@ -113,19 +117,32 @@ export default function OnboardingPage() {
           <TrippaMark />
           <b className="text-[15px]">Trippa</b>
         </div>
-        <span className="dim tap text-[13px]" onClick={() => done("/")}>
+        <button
+          className="dim tap text-[13px]"
+          style={{ background: "none", border: "none", fontFamily: "inherit" }}
+          onClick={() => done("/")}
+        >
           {t("ob.skip")}
-        </span>
+        </button>
       </div>
 
-      {/* hero photo with floating AI plan card */}
+      {/* hero photo with floating AI plan card — background-image fails
+          silently to the gradient beneath, never a broken-image glyph */}
       <div className="relative overflow-hidden rounded-[24px] mt-[18px]" style={{ height: 380 }}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="https://images.unsplash.com/photo-1505228395891-9a51e7e86bf6?auto=format&fit=crop&w=700&q=70"
-          alt=""
-          className="absolute inset-0 w-full h-full object-cover"
-          style={{ backgroundColor: "#2a3550" }}
+        <div
+          className="absolute inset-0"
+          style={{
+            background: "linear-gradient(165deg, #1d2a4a, #2a3550 48%, #1b2340)",
+          }}
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage:
+              "url('https://images.unsplash.com/photo-1505228395891-9a51e7e86bf6?auto=format&fit=crop&w=700&q=70')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
         />
         <div className="photo-cap-ov" />
         <div className="glass absolute left-4 right-4 top-4 flex items-center gap-3 p-3" style={{ borderRadius: 16 }}>

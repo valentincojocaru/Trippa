@@ -59,7 +59,7 @@ export default function PackingPage() {
 
   return (
     <>
-      <ScreenHeader title={trip ? "Packing · " + trip.name.split(/[,&]/)[0].trim() : "Packing"} backHref={trip ? `/trip/${trip.id}` : "/"} />
+      <ScreenHeader title={trip ? "Packing · " + trip.name.split(/[,&]/)[0].trim() : "Packing"} backHref={trip ? `/trip/active` : "/"} />
       <div className="screen-body">
         <div className="card p-4 flex items-center justify-between">
           <div>

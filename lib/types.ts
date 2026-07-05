@@ -110,6 +110,7 @@ export type Trip = {
   budget: number;
   bestTime?: string;
   weather?: string;
+  visa?: string;
   transport?: string;
   tips?: string[];
   flights?: TripFlights | null;

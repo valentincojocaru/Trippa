@@ -99,7 +99,7 @@ export default function TripResultsPage() {
     dateStr = new Date(trip.date).toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" });
   }
 
-  const base = `/trip/${trip.id}`;
+  const base = `/trip/active`;
   const links = [
     { href: `${base}/itinerary`, t: t("qa.itinerary"), bg: "rgba(37,99,235,.1)", c: "var(--accent)", Icon: CalendarDays },
     { href: `${base}/map`, t: t("rs.lMap"), bg: "rgba(22,163,74,.12)", c: "var(--green)", Icon: MapIcon },
@@ -320,7 +320,7 @@ export default function TripResultsPage() {
         </div>
 
         {/* good to know */}
-        {(trip.bestTime || trip.weather || trip.transport) && (
+        {(trip.bestTime || trip.weather || trip.transport || trip.visa) && (
           <>
             <div className="rs-sec">{t("rs.goodToKnow")}</div>
             <div className="card p-[15px] flex flex-col gap-[10px]">
@@ -348,6 +348,15 @@ export default function TripResultsPage() {
                   <div>
                     <b className="text-[13px]">{t("rs.transport")}</b>
                     <div className="dim text-[12px]">{trip.transport}</div>
+                  </div>
+                </div>
+              )}
+              {trip.visa && (
+                <div className="rs-fact">
+                  <span>🛂</span>
+                  <div>
+                    <b className="text-[13px]">{t("rs.visa")}</b>
+                    <div className="dim text-[12px]">{trip.visa}</div>
                   </div>
                 </div>
               )}

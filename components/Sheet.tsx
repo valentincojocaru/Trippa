@@ -49,6 +49,15 @@ export default function Sheet({
     setTimeout(() => onClose(v), 200);
   };
 
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") close(null);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <div
       className={"tx-overlay" + (on ? " on" : "")}
@@ -56,16 +65,18 @@ export default function Sheet({
         if (e.target === e.currentTarget) close(null);
       }}
     >
-      <div className="tx-sheet">
+      <div className="tx-sheet" role="dialog" aria-modal="true" aria-label={title}>
+        <div className="tx-grab" />
         <div className="flex items-center justify-between mb-[14px]">
           <b className="text-[16px]">{title}</b>
-          <div
+          <button
             className="itile glass2 tap"
-            style={{ width: 32, height: 32, borderRadius: 10 }}
+            style={{ width: 32, height: 32, borderRadius: 10, border: "1px solid var(--border)" }}
             onClick={() => close(null)}
+            aria-label="Close"
           >
             <X size={15} strokeWidth={2.4} />
-          </div>
+          </button>
         </div>
         <div className="flex flex-col gap-[13px]">
           {fields.map((f) => (

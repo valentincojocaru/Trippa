@@ -22,9 +22,15 @@ export default function EmptyState({
 }) {
   const router = useRouter();
   return (
-    <div className="card p-[30px] text-center">
-      <div className="text-[30px] mb-2">{emoji}</div>
-      <div className="muted text-[13px] leading-[1.5] whitespace-pre-line">{text}</div>
+    <div className="card p-[30px] text-center flex flex-col items-center">
+      <div
+        className="itile acc mb-3"
+        style={{ width: 64, height: 64, borderRadius: 22, fontSize: 28 }}
+        aria-hidden
+      >
+        {emoji}
+      </div>
+      <div className="muted text-[13px] leading-[1.55] whitespace-pre-line max-w-[280px]">{text}</div>
       {ctaLabel && ctaHref && (
         <button className="btn btn-primary tap mt-4" onClick={() => router.push(ctaHref)}>
           {ctaLabel}

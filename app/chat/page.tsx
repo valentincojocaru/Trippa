@@ -1,11 +1,11 @@
 "use client";
 
-/* AI Concierge — chat with full trip context (port of features.js
-   wireChat). Without an AI key it says so honestly and points to
-   Settings — it never fakes an answer. */
+/* AI Concierge — chat with full trip context. Talks only to our own
+   /api/ai backend (server-side key); when the backend has no key it says
+   so honestly — it never fakes an answer and never holds a key itself. */
 
 import { useEffect, useRef, useState } from "react";
-import { ArrowUp } from "lucide-react";
+import { ArrowUp, Sparkles, UtensilsCrossed, Compass, CalendarClock, Gem } from "lucide-react";
 import ScreenHeader from "@/components/ScreenHeader";
 import { store, useStoreVersion } from "@/lib/store";
 import { aiService } from "@/lib/services/aiService";
@@ -65,7 +65,7 @@ export default function ChatPage() {
       reply = await aiService.complete(persona() + "\n\nConversation so far:\n" + transcript + "\n\nWrite Trippa's next reply only.");
     } catch (e: any) {
       reply = /no-key/.test(e?.message || "")
-        ? "I need an AI key to chat — add your OpenAI or Anthropic key in Settings (it stays on your device) and I'll be right here."
+        ? "AI chat isn't available right now — it needs the server AI key configured. I can still help you navigate your trip."
         : "I'm offline right now — reconnect and I'll plan your day. Meanwhile, check your itinerary and saved places.";
     }
     setTyping(false);
@@ -73,6 +73,13 @@ export default function ChatPage() {
   }
 
   const suggestions = ["What should I do today?", "Best local food nearby?", "Rearrange my afternoon", "Hidden gems?"];
+  const starters = [
+    { Icon: CalendarClock, label: "What should I do today?" },
+    { Icon: UtensilsCrossed, label: "Best local food nearby?" },
+    { Icon: Compass, label: "Rearrange my afternoon" },
+    { Icon: Gem, label: "Hidden gems?" },
+  ];
+  const fresh = hist.length <= 1 && !typing;
 
   return (
     <div className="flex flex-col" style={{ minHeight: "100dvh" }}>
@@ -83,6 +90,39 @@ export default function ChatPage() {
             {m.t}
           </div>
         ))}
+        {fresh && (
+          /* welcome state — fills the empty room with a brand orb and starters */
+          <div className="flex-1 flex flex-col items-center justify-center gap-5 py-8">
+            <span
+              className="itile"
+              style={{
+                width: 64,
+                height: 64,
+                borderRadius: 22,
+                background: "var(--accent-grad)",
+                boxShadow: "0 14px 34px -10px var(--accent-glow)",
+              }}
+            >
+              <Sparkles size={26} color="#fff" fill="#fff" />
+            </span>
+            <div className="dim text-[12.5px]">Try one of these</div>
+            <div className="w-full flex flex-col gap-[9px]" style={{ maxWidth: 300 }}>
+              {starters.map(({ Icon, label }) => (
+                <button
+                  key={label}
+                  className="card tap flex items-center gap-3 text-left"
+                  style={{ padding: "12px 14px", fontFamily: "inherit", fontSize: 13.5, fontWeight: 600, color: "var(--text)" }}
+                  onClick={() => send(label)}
+                >
+                  <span className="itile acc" style={{ width: 34, height: 34, borderRadius: 11 }}>
+                    <Icon size={16} />
+                  </span>
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
         {typing && (
           <div className="bub ai">
             <span className="tx-typing">
@@ -99,13 +139,15 @@ export default function ChatPage() {
         className="fixed left-1/2 -translate-x-1/2 z-40 w-full"
         style={{ maxWidth: 430, bottom: 92, padding: "0 16px" }}
       >
-        <div className="flex gap-2 overflow-x-auto pb-2" style={{ scrollbarWidth: "none" }}>
-          {suggestions.map((s) => (
-            <span key={s} className="pill tap" onClick={() => send(s)}>
-              {s}
-            </span>
-          ))}
-        </div>
+        {!fresh && (
+          <div className="flex gap-2 overflow-x-auto pb-2" style={{ scrollbarWidth: "none" }}>
+            {suggestions.map((s) => (
+              <span key={s} className="pill tap" onClick={() => send(s)}>
+                {s}
+              </span>
+            ))}
+          </div>
+        )}
         <div className="flex items-center gap-[9px]">
           <input
             className="tx-input flex-1"

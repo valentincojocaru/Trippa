@@ -52,7 +52,7 @@ export default function SplitPage() {
 
   return (
     <>
-      <ScreenHeader title="Split" backHref={trip ? `/trip/${trip.id}` : "/"} />
+      <ScreenHeader title="Split" backHref={trip ? `/trip/active` : "/"} />
       <div className="screen-body">
         <div className="card p-[14px]">
           <div className="dim text-[12px]">Trip total · {d.people.length} people</div>

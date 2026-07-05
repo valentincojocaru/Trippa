@@ -13,6 +13,7 @@ import { Plane } from "lucide-react";
 import ScreenHeader from "@/components/ScreenHeader";
 import EmptyState from "@/components/EmptyState";
 import EstimateBadge from "@/components/EstimateBadge";
+import { SkeletonList } from "@/components/Skeleton";
 import { useTrip } from "@/lib/useTrip";
 import { affiliateService } from "@/lib/services/affiliateService";
 import { flightService } from "@/lib/services/flightService";
@@ -68,10 +69,10 @@ export default function FlightsPage() {
 
   return (
     <>
-      <ScreenHeader title="Flights" backHref={`/trip/${trip.id}`} />
+      <ScreenHeader title="Flights" backHref={`/trip/active`} />
       <div className="screen-body">
         {!res ? (
-          <div className="card p-6 text-center muted text-[13px]">Searching flights…</div>
+          <SkeletonList n={2} />
         ) : res.meta.needs === "origin" ? (
           /* never invent a departure airport */
           <div className="card p-[18px] flex gap-[13px] items-center">

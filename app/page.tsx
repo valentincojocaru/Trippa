@@ -106,9 +106,11 @@ export default function HomePage() {
   // computed client-side only — the page is prerendered at build time and
   // a baked-in greeting would mismatch on hydration
   const [greet, setGreet] = useState("");
+  const [greetEmoji, setGreetEmoji] = useState("");
   useEffect(() => {
     const hour = new Date().getHours();
     setGreet(hour < 12 ? t("home.morning") : hour < 18 ? t("home.afternoon") : t("home.evening"));
+    setGreetEmoji(hour < 12 ? "☀️" : hour < 18 ? "🌤️" : "🌙");
   }, []);
 
   const qa = useMemo(
@@ -127,6 +129,34 @@ export default function HomePage() {
     ],
     [t]
   );
+
+  // The dashboard is entirely localStorage-driven, so the prerendered HTML has
+  // nothing to show. Render a deterministic shell until mounted — this makes the
+  // server output and the first client render byte-identical and rules out the
+  // whole class of hydration text mismatches (React #418) this page is prone to.
+  if (!mounted) {
+    return (
+      <div className="screen-body">
+        <div className="flex items-center justify-between">
+          <div className="itile glass" style={{ width: 42, height: 42, borderRadius: 13 }} />
+          <div className="flex items-center gap-2">
+            <TrippaMark size={17} />
+            <span className="text-[23px] font-extrabold tracking-[-0.03em]">
+              Trip<span className="t-acc">pa</span>
+            </span>
+          </div>
+          <div className="itile glass" style={{ width: 42, height: 42, borderRadius: 13 }} />
+        </div>
+        <div className="skel mt-5 skel-line w60" style={{ height: 16 }} />
+        <div className="skel mt-[10px]" style={{ height: 54, borderRadius: 16 }} />
+        <div className="skel mt-[18px]" style={{ height: 168, borderRadius: 22 }} />
+        <div className="grid grid-cols-2 gap-3 mt-[14px]">
+          <div className="skel" style={{ height: 104, borderRadius: 22 }} />
+          <div className="skel" style={{ height: 104, borderRadius: 22 }} />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="screen-body">
@@ -160,7 +190,7 @@ export default function HomePage() {
       <div className="mt-5">
         <div className="dim text-[14px]">
           {greet}
-          {name ? `, ${name}` : ""} ☀️
+          {name ? `, ${name}` : ""} {greetEmoji}
         </div>
         <h1 className="text-[27px] mt-[3px]">{t("home.whereNext")}</h1>
       </div>
@@ -185,7 +215,7 @@ export default function HomePage() {
           hero={trip?.hero}
           className="relative tap"
           style={{ height: 168 }}
-          onClick={() => router.push(trip ? `/trip/${trip.id}` : "/plan")}
+          onClick={() => router.push(trip ? `/trip/active` : "/plan")}
         >
           <div className="photo-cap-ov" />
           <div className="absolute left-[14px] right-[14px] bottom-3">

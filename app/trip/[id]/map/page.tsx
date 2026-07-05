@@ -100,7 +100,7 @@ export default function MapPage() {
         <div
           className="itile glass tap"
           style={{ width: 40, height: 40, borderRadius: 13 }}
-          onClick={() => router.push(`/trip/${trip.id}`)}
+          onClick={() => router.push(`/trip/active`)}
         >
           <ChevronLeft size={19} strokeWidth={2.2} />
         </div>

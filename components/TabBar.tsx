@@ -26,26 +26,26 @@ export default function TabBar() {
     Icon: typeof Home,
     active: boolean
   ) => (
-    <div
+    <button
       className={"ico" + (active ? " on" : "")}
       onClick={() => router.push(href)}
-      role="button"
       aria-label={label}
+      aria-current={active ? "page" : undefined}
     >
       <Icon size={22} strokeWidth={2} />
       {label}
-    </div>
+    </button>
   );
 
   return (
-    <div className="tabbar">
+    <nav className="tabbar" aria-label="Main">
       {tab("/", t("tab.home"), Home, pathname === "/")}
       {tab("/trips", t("tab.trips"), MapIcon, pathname.startsWith("/trips"))}
-      <div className="tab-fab" onClick={() => router.push("/plan")} aria-label="Plan a trip">
+      <button className="tab-fab" onClick={() => router.push("/plan")} aria-label="Plan a trip">
         <Sparkles size={24} color="#fff" strokeWidth={2.2} />
-      </div>
+      </button>
       {tab("/chat", t("tab.chat"), MessageCircle, pathname.startsWith("/chat"))}
       {tab("/profile", t("tab.profile"), User, pathname.startsWith("/profile"))}
-    </div>
+    </nav>
   );
 }
