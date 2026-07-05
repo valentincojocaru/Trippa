@@ -114,11 +114,13 @@ h3 {
   flex-direction: column;
 }
 @media (prefers-reduced-motion: no-preference) {
-  .route-shell { animation: route-in 0.34s cubic-bezier(0.22, 0.61, 0.36, 1) both; }
+  /* opacity-only: the vertical motion belongs to the child stagger inside
+     .screen-body — this is just a clean cross-fade layered under it */
+  .route-shell { animation: route-in 0.3s ease both; }
 }
 @keyframes route-in {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: none; }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .screen-body {
