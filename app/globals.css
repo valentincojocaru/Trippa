@@ -1918,16 +1918,18 @@ select.tx-input { height: 50px; }
   top: 18px;
   right: 20px;
   color: #fff;
-  font-size: 22px;
   width: 40px;
   height: 40px;
+  border: none;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
 }
+.iv-close:active { transform: scale(0.92); }
 .av-sm {
   width: 34px;
   height: 34px;
