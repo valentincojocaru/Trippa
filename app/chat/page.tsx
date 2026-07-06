@@ -33,6 +33,7 @@ export default function ChatPage() {
   useStoreVersion();
   const [input, setInput] = useState("");
   const [typing, setTyping] = useState(false);
+  const [streamText, setStreamText] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
   useEffect(() => setMounted(true), []);
@@ -59,15 +60,20 @@ export default function ChatPage() {
     const h = [...hist, { r: "me" as const, t: text }];
     store.set("chat", h);
     setTyping(true);
+    setStreamText("");
     let reply = "";
     try {
       const transcript = h.map((m) => (m.r === "me" ? "User: " : "Trippa: ") + m.t).join("\n");
-      reply = await aiService.complete(persona() + "\n\nConversation so far:\n" + transcript + "\n\nWrite Trippa's next reply only.");
+      const promptText =
+        persona() + "\n\nConversation so far:\n" + transcript + "\n\nWrite Trippa's next reply only.";
+      // stream tokens into the live bubble; fall back to buffered on any issue
+      reply = await aiService.stream(promptText, { tier: "fast" }, (partial) => setStreamText(partial));
     } catch (e: any) {
       reply = /no-key/.test(e?.message || "")
         ? "AI chat isn't available right now — it needs the server AI key configured. I can still help you navigate your trip."
         : "I'm offline right now — reconnect and I'll plan your day. Meanwhile, check your itinerary and saved places.";
     }
+    setStreamText(null);
     setTyping(false);
     store.set("chat", [...h, { r: "ai", t: reply.trim() }]);
   }
@@ -125,11 +131,18 @@ export default function ChatPage() {
         )}
         {typing && (
           <div className="bub ai">
-            <span className="tx-typing">
-              <i />
-              <i />
-              <i />
-            </span>
+            {streamText ? (
+              <span>
+                {streamText}
+                <span className="tx-caret" />
+              </span>
+            ) : (
+              <span className="tx-typing">
+                <i />
+                <i />
+                <i />
+              </span>
+            )}
           </div>
         )}
         <div ref={endRef} />
