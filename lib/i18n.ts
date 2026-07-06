@@ -16,6 +16,7 @@ const dict: Record<string, { en: string; ro: string }> = {
   /* tab bar */
   "tab.home": { en: "Home", ro: "Acasă" },
   "tab.trips": { en: "Trips", ro: "Călătorii" },
+  "tab.plan": { en: "Plan", ro: "Planifică" },
   "tab.chat": { en: "Chat", ro: "Chat" },
   "tab.profile": { en: "Profile", ro: "Profil" },
 

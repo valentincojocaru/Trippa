@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/react";
 import TabBar from "@/components/TabBar";
+import DesktopNav from "@/components/DesktopNav";
 import Toaster from "@/components/Toast";
 import SwRegister from "@/components/SwRegister";
 import ThemeApplier from "@/components/ThemeApplier";
@@ -27,6 +28,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body>
         <div className="app-frame">{children}</div>
+        <DesktopNav />
         <TabBar />
         <Toaster />
         <SwRegister />

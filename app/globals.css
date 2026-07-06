@@ -2143,6 +2143,100 @@ html[data-theme="dark"] .skel::after {
    transition so the two don't double-animate */
 .fmot { transition: none !important; }
 
+/* ---------- desktop sidebar nav (≥1024px) ---------- */
+.dnav { display: none; }
+@media (min-width: 1024px) {
+  /* the floating tab bar gives way to a persistent sidebar */
+  .tabbar-mobile { display: none !important; }
+  .dnav {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    position: fixed;
+    z-index: 60;
+    top: 50%;
+    transform: translateY(-50%);
+    left: max(24px, calc((100vw - 430px) / 2 - 258px));
+    width: 234px;
+    padding: 16px 14px;
+    background: rgba(255, 255, 255, 0.72);
+    backdrop-filter: blur(28px) saturate(1.6);
+    -webkit-backdrop-filter: blur(28px) saturate(1.6);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 24px;
+    box-shadow: var(--shadow-lg);
+  }
+  .dnav-brand {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 6px 10px 14px;
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--text);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .dnav-items { display: flex; flex-direction: column; gap: 4px; }
+  .dnav-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    height: 46px;
+    padding: 0 14px;
+    border: none;
+    background: none;
+    border-radius: 13px;
+    font-family: inherit;
+    font-size: 14.5px;
+    font-weight: 600;
+    color: var(--text-2);
+    cursor: pointer;
+    transition: color 0.15s;
+  }
+  .dnav-item > svg,
+  .dnav-item > span { position: relative; z-index: 1; }
+  .dnav-item.on { color: var(--accent-2); }
+  .dnav-pill {
+    position: absolute;
+    inset: 0;
+    border-radius: 13px;
+    background: var(--accent-soft);
+    z-index: 0;
+  }
+  .dnav-cta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 46px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 14px;
+    background: var(--accent-grad);
+    color: #fff;
+    font-family: inherit;
+    font-size: 14.5px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 8px 22px -8px var(--accent-glow);
+    order: -1; /* CTA sits directly under the brand, above the list */
+  }
+}
+@media (min-width: 1024px) and (hover: hover) {
+  .dnav-item:not(.on):hover { color: var(--text); }
+  .dnav-cta:hover { filter: brightness(1.07); transform: translateY(-1px); }
+  .dnav-brand:hover { opacity: 0.85; }
+}
+html[data-theme="dark"] .dnav {
+  background: rgba(17, 27, 50, 0.78);
+  border-color: rgba(110, 155, 255, 0.14);
+}
+
 /* sliding active-tab indicator (Framer layoutId) */
 .tabbar .ico { position: relative; }
 .tab-pill {
