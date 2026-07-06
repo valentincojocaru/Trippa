@@ -200,7 +200,7 @@ export default function PlanPage() {
           <div className="dim text-[11px] tracking-[0.1em]">{label.toUpperCase()}</div>
           <b className="text-[14px]">{val || "—"}</b>
         </div>
-        <Pencil size={16} color="#9295A0" strokeWidth={2} />
+        <Pencil size={16} color="var(--text-3)" strokeWidth={2} />
       </div>
     );
 

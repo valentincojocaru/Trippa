@@ -201,7 +201,7 @@ export default function HomePage() {
 
       {/* search → planner */}
       <div className="home-search tap" onClick={() => router.push("/plan")}>
-        <Search size={19} color="#9295A0" strokeWidth={2} />
+        <Search size={19} color="var(--text-3)" strokeWidth={2} />
         <span>{t("home.searchPh")}</span>
         <span className="hs-go">
           <ArrowRight size={17} color="#fff" strokeWidth={2.4} />
