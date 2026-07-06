@@ -908,6 +908,8 @@ function Processing({ S }: { S: PlanState }) {
     })();
 
     return () => clearInterval(iv);
+    // generation runs once for this trip; `t` is only used for status labels
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [S, steps, router]);
 
   if (error) {

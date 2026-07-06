@@ -111,6 +111,8 @@ export default function HomePage() {
     const hour = new Date().getHours();
     setGreet(hour < 12 ? t("home.morning") : hour < 18 ? t("home.afternoon") : t("home.evening"));
     setGreetEmoji(hour < 12 ? "☀️" : hour < 18 ? "🌤️" : "🌙");
+    // run once on mount — the greeting shouldn't reset when `t`'s identity changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const qa = useMemo(
