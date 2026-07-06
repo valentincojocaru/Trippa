@@ -164,29 +164,31 @@ export default function HomePage() {
     <div className="screen-body">
       {/* header */}
       <div className="flex items-center justify-between">
-        <div
+        <button
+          type="button"
           className="itile glass tap"
-          style={{ width: 42, height: 42, borderRadius: 13 }}
+          style={{ width: 42, height: 42, borderRadius: 13, padding: 0, color: "var(--text)" }}
           onClick={() => router.push("/trips")}
           aria-label="My trips"
         >
           <Menu size={20} strokeWidth={2} />
-        </div>
+        </button>
         <div className="flex items-center gap-2">
           <TrippaMark size={17} />
           <span className="text-[23px] font-extrabold tracking-[-0.03em]">
             Trip<span className="t-acc">pa</span>
           </span>
         </div>
-        <div
+        <button
+          type="button"
           className="itile glass tap relative"
-          style={{ width: 42, height: 42, borderRadius: 13 }}
+          style={{ width: 42, height: 42, borderRadius: 13, padding: 0, color: "var(--text)" }}
           onClick={() => router.push("/reminders")}
           aria-label="Reminders"
         >
           <Bell size={20} strokeWidth={2} />
           {bellCount > 0 && <span className="rm-bell-badge">{bellCount}</span>}
-        </div>
+        </button>
       </div>
 
       <div className="mt-5">

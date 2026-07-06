@@ -97,13 +97,15 @@ export default function MapPage() {
     <div className="relative flex-1" style={{ minHeight: "100dvh" }}>
       <div ref={mapEl} className="map-full" />
       <div className="absolute top-4 left-4 z-[500]">
-        <div
+        <button
+          type="button"
           className="itile glass tap"
-          style={{ width: 40, height: 40, borderRadius: 13 }}
+          style={{ width: 40, height: 40, borderRadius: 13, padding: 0, color: "var(--text)" }}
           onClick={() => router.push(`/trip/active`)}
+          aria-label="Back to trip"
         >
           <ChevronLeft size={19} strokeWidth={2.2} />
-        </div>
+        </button>
       </div>
       <div
         className="glass absolute top-4 left-1/2 -translate-x-1/2 z-[500] px-4 py-2 text-[13px] font-bold"
