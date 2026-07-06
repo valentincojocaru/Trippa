@@ -26,18 +26,30 @@ export default function SettingsPage() {
         <div className="sec-lbl mb-2">{t("st.language")}</div>
         <div className="seg acc mb-5">
           {(["ro", "en"] as const).map((l) => (
-            <span key={l} className={getLang() === l ? "on" : ""} onClick={() => setLang(l)}>
+            <button
+              key={l}
+              type="button"
+              className={getLang() === l ? "on" : ""}
+              aria-pressed={getLang() === l}
+              onClick={() => setLang(l)}
+            >
               {l === "ro" ? "🇷🇴 Română" : "🇬🇧 English"}
-            </span>
+            </button>
           ))}
         </div>
 
         <div className="sec-lbl mb-2">{t("st.theme")}</div>
         <div className="seg acc mb-5">
           {(["auto", "light", "dark"] as const).map((m) => (
-            <span key={m} className={getTheme() === m ? "on" : ""} onClick={() => setTheme(m)}>
+            <button
+              key={m}
+              type="button"
+              className={getTheme() === m ? "on" : ""}
+              aria-pressed={getTheme() === m}
+              onClick={() => setTheme(m)}
+            >
               {m === "auto" ? t("st.auto") : m === "light" ? t("st.light") : t("st.dark")}
-            </span>
+            </button>
           ))}
         </div>
 

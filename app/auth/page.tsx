@@ -48,17 +48,27 @@ export default function AuthPage() {
 
   return (
     <div className="screen-body" style={{ paddingBottom: 30 }}>
-      <TrippaMark size={26} />
-      <h1 className="text-[29px] mt-6">{t("auth.welcome")}</h1>
-      <p className="muted mt-[10px] text-[14.5px]">{t("auth.sub")}</p>
+      <div className="flex items-center gap-[10px]">
+        <TrippaMark size={24} />
+        <span className="text-[22px] font-extrabold tracking-[-0.03em]">
+          Trip<span className="t-acc">pa</span>
+        </span>
+      </div>
+      <h1 className="text-[29px] mt-7">{t("auth.welcome")}</h1>
+      <p className="muted mt-[10px] text-[14.5px] leading-[1.5]">{t("auth.sub")}</p>
 
       <div className="seg acc mt-6">
-        <span className={mode === "signin" ? "on" : ""} onClick={() => setMode("signin")}>
-          {t("auth.signin")}
-        </span>
-        <span className={mode === "signup" ? "on" : ""} onClick={() => setMode("signup")}>
-          {t("auth.register")}
-        </span>
+        {(["signin", "signup"] as const).map((m) => (
+          <button
+            key={m}
+            type="button"
+            className={mode === m ? "on" : ""}
+            aria-pressed={mode === m}
+            onClick={() => setMode(m)}
+          >
+            {m === "signin" ? t("auth.signin") : t("auth.register")}
+          </button>
+        ))}
       </div>
 
       <div className="flex flex-col gap-[14px] mt-[22px]">
@@ -66,7 +76,7 @@ export default function AuthPage() {
           <div className="field">
             <label>{t("auth.name")}</label>
             <div className="input">
-              <User size={18} color="#6E6E78" strokeWidth={2} />
+              <User size={18} color="var(--text-3)" strokeWidth={2} />
               <input placeholder={t("auth.namePh")} autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} />
             </div>
           </div>
@@ -74,18 +84,24 @@ export default function AuthPage() {
         <div className="field">
           <label>{t("auth.email")}</label>
           <div className="input">
-            <Mail size={18} color="#6E6E78" strokeWidth={2} />
+            <Mail size={18} color="var(--text-3)" strokeWidth={2} />
             <input type="email" placeholder="you@email.com" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} />
           </div>
         </div>
         <div className="field">
           <label>{t("auth.password")}</label>
           <div className="input">
-            <Lock size={18} color="#2563EB" strokeWidth={2} />
-            <input type="password" placeholder="••••••••" autoComplete="current-password" value={pass} onChange={(e) => setPass(e.target.value)} />
+            <Lock size={18} color="var(--text-3)" strokeWidth={2} />
+            <input
+              type="password"
+              placeholder="••••••••"
+              autoComplete={mode === "signin" ? "current-password" : "new-password"}
+              value={pass}
+              onChange={(e) => setPass(e.target.value)}
+            />
           </div>
         </div>
-        <div className="text-[12.5px] min-h-4 leading-[1.4]" style={{ color: "#C2456B" }}>
+        <div className="text-[12.5px] min-h-4 leading-[1.4]" role="alert" style={{ color: "var(--pink)" }}>
           {msg}
         </div>
         <button className="btn btn-primary tap" onClick={submit} disabled={busy}>

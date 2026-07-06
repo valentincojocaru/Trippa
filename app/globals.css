@@ -367,22 +367,28 @@ select.tx-input { height: 50px; }
   padding: 4px;
   gap: 4px;
 }
-.seg span {
+.seg span,
+.seg button {
   flex: 1;
   text-align: center;
   padding: 9px;
+  border: none;
+  background: none;
+  font-family: inherit;
   border-radius: 10px;
   font-size: 13px;
   font-weight: 600;
   color: var(--text-2);
   cursor: pointer;
 }
-.seg span.on {
+.seg span.on,
+.seg button.on {
   background: var(--surface-solid-2);
   color: var(--text);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
 }
-.seg.acc span.on { background: var(--accent-grad); color: #fff; }
+.seg.acc span.on,
+.seg.acc button.on { background: var(--accent-grad); color: #fff; }
 
 /* progress / meter */
 .meter { height: 8px; border-radius: 6px; background: var(--surface-2); overflow: hidden; }
@@ -1912,16 +1918,18 @@ select.tx-input { height: 50px; }
   top: 18px;
   right: 20px;
   color: #fff;
-  font-size: 22px;
   width: 40px;
   height: 40px;
+  border: none;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
 }
+.iv-close:active { transform: scale(0.92); }
 .av-sm {
   width: 34px;
   height: 34px;
@@ -1990,7 +1998,8 @@ html[data-theme="dark"] .tabbar {
   background: rgba(17, 27, 50, 0.78);
   border-color: rgba(110, 155, 255, 0.14);
 }
-html[data-theme="dark"] .seg span.on { background: var(--surface-2); color: var(--text); box-shadow: none; }
+html[data-theme="dark"] .seg span.on,
+html[data-theme="dark"] .seg button.on { background: var(--surface-2); color: var(--text); box-shadow: none; }
 html[data-theme="dark"] .rs-chip { background: rgba(17, 27, 50, 0.88); color: var(--text); }
 html[data-theme="dark"] .mt-badge { background: rgba(232, 237, 247, 0.92); }
 html[data-theme="dark"] .wz-tg-box:after { background: #cbd5ec; }
@@ -2083,7 +2092,8 @@ html[data-theme="dark"] ::selection { background: rgba(110, 155, 255, 0.32); }
   .wz-bag:hover,
   .wz-pet-t:hover { border-color: var(--accent); color: var(--accent); }
   .pill:hover { border-color: var(--border-2); color: var(--text); }
-  .seg span:not(.on):hover { color: var(--text); }
+  .seg span:not(.on):hover,
+  .seg button:not(.on):hover { color: var(--text); }
   .ht-seg:not(.on):hover { color: var(--text); }
   .mt-tab:not(.on):hover { color: var(--text-2); }
   .wz-cd:not(.dep):not(.ret):not(.rng):hover { background: var(--surface-2); }

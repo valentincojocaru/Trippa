@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import ScreenHeader from "@/components/ScreenHeader";
 import Sheet from "@/components/Sheet";
 import EmptyState from "@/components/EmptyState";
+import ImageViewer from "@/components/ImageViewer";
 import { Camera } from "lucide-react";
 import { store, useStoreVersion } from "@/lib/store";
 import { pickPhoto } from "@/lib/photo";
@@ -108,13 +109,7 @@ export default function JournalPage() {
         />
       )}
 
-      {view && (
-        <div className="img-viewer" onClick={() => setView(null)}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={view} alt="" />
-          <span className="iv-close">✕</span>
-        </div>
-      )}
+      <ImageViewer src={view} alt="Journal photo" onClose={() => setView(null)} />
     </>
   );
 }

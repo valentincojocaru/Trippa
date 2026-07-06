@@ -69,7 +69,7 @@ export default function ProfilePage() {
               <b>{t}</b>
               <span>{sub}</span>
             </div>
-            <ChevronRight size={17} color="#9295A0" strokeWidth={2} />
+            <ChevronRight size={17} color="var(--text-3)" strokeWidth={2} />
           </div>
         ))}
       </div>

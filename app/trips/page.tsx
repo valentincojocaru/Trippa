@@ -124,7 +124,7 @@ export default function TripsPage() {
                     {f.city || ""} · {f.tag || "Saved"}
                   </div>
                 </div>
-                <ChevronRight size={17} color="#9295A0" strokeWidth={2} />
+                <ChevronRight size={17} color="var(--text-3)" strokeWidth={2} />
               </div>
             ))
           ) : (
