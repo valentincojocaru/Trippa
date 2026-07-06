@@ -60,4 +60,33 @@ export const aiService = {
     if (!(await checkServer())) throw new Error("no-key");
     return completeViaServer(prompt, tier);
   },
+
+  /** Streaming completion for conversational UI. Calls onDelta with the
+      cumulative text as tokens arrive; resolves with the full text. Throws
+      "no-key" when no backend key is available. */
+  async stream(
+    prompt: string,
+    opts: { tier?: AiTier } = {},
+    onDelta?: (full: string) => void
+  ): Promise<string> {
+    const tier = opts.tier || "deep";
+    if (!(await checkServer())) throw new Error("no-key");
+    const r = await fetch(apiBase() + "/api/ai", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt, tier, stream: true }),
+    });
+    if (r.status === 501) throw new Error("no-key");
+    if (!r.ok || !r.body) throw new Error("ai " + r.status);
+    const reader = r.body.getReader();
+    const dec = new TextDecoder();
+    let full = "";
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      full += dec.decode(value, { stream: true });
+      onDelta?.(full);
+    }
+    return full;
+  },
 };

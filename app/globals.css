@@ -449,6 +449,18 @@ select.tx-input { height: 50px; }
   0%, 80%, 100% { opacity: 0.3; transform: translateY(0); }
   40% { opacity: 1; transform: translateY(-4px); }
 }
+/* streaming caret — blinks at the end of the in-progress AI reply */
+.tx-caret {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  background: var(--accent);
+  border-radius: 1px;
+  animation: tx-caret 1s steps(1) infinite;
+}
+@keyframes tx-caret { 0%, 50% { opacity: 1; } 50.01%, 100% { opacity: 0; } }
 
 /* floating frosted tab bar */
 .tabbar {
@@ -2127,6 +2139,25 @@ html[data-theme="dark"] .skel::after {
   background: var(--border-2);
   margin: -6px auto 12px;
 }
+/* when Framer Motion drives an element's transform/opacity, silence the CSS
+   transition so the two don't double-animate */
+.fmot { transition: none !important; }
+
+/* sliding active-tab indicator (Framer layoutId) */
+.tabbar .ico { position: relative; }
+.tab-pill {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 50%;
+  width: 52px;
+  margin-left: -26px;
+  border-radius: 14px;
+  background: var(--accent-soft);
+  z-index: 0;
+}
+.tabbar .ico > svg,
+.tabbar .ico > span.tab-lbl { position: relative; z-index: 1; }
 
 /* respect users who turn motion off */
 @media (prefers-reduced-motion: reduce) {

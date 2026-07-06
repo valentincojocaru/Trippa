@@ -12,6 +12,7 @@ import { Plane, ChevronUp, Pencil, Trash2, Plus } from "lucide-react";
 import ScreenHeader from "@/components/ScreenHeader";
 import EmptyState from "@/components/EmptyState";
 import Sheet, { type SheetField } from "@/components/Sheet";
+import SheetShell from "@/components/SheetShell";
 import { toast } from "@/components/Toast";
 import { useTrip } from "@/lib/useTrip";
 import { store, useStoreVersion } from "@/lib/store";
@@ -95,7 +96,7 @@ export default function ItineraryPage() {
     }
   }
 
-  async function doReplan(di: number, reason: ReplanReason) {
+  async function doReplan(di: number, reason: ReplanReason, close?: () => void) {
     if (!(await aiService.available())) {
       toast(t("tk.importNoKey"));
       return;
@@ -107,7 +108,7 @@ export default function ItineraryPage() {
       d[di] = { ...d[di], items: items.map((it) => ({ ...it, icon: "view" })) };
       saveItin(d);
       toast(t("rp.done"));
-      setReplanFor(null);
+      (close || (() => setReplanFor(null)))();
     } catch {
       toast(t("rp.fail"));
     } finally {
@@ -332,37 +333,38 @@ export default function ItineraryPage() {
       </div>
       {sheet && <Sheet title={sheet.title} fields={sheet.fields} submitLabel={sheet.submit} onClose={sheet.onDone} />}
       {replanFor != null && (
-        <div
-          className="tx-overlay on"
-          onClick={(e) => {
-            if (e.target === e.currentTarget && !replanning) setReplanFor(null);
-          }}
+        <SheetShell
+          ariaLabel={t("rp.title")}
+          dismissible={!replanning}
+          onClose={() => setReplanFor(null)}
         >
-          <div className="tx-sheet">
-            <b className="text-[16px]">{t("rp.title")}</b>
-            <div className="dim text-[12.5px] mt-1 mb-4">{t("rp.reason")}</div>
-            <div className="flex flex-col gap-[9px]">
-              {(
-                [
-                  ["rain", t("rp.rain")],
-                  ["closed", t("rp.closed")],
-                  ["relaxed", t("rp.relaxed")],
-                  ["adventurous", t("rp.adventurous")],
-                ] as [ReplanReason, string][]
-              ).map(([k, l]) => (
-                <button
-                  key={k}
-                  className="wz-chip tap"
-                  style={{ justifyContent: "flex-start" }}
-                  disabled={replanning}
-                  onClick={() => doReplan(replanFor, k)}
-                >
-                  {replanning ? "✨ …" : l}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
+          {(close) => (
+            <>
+              <b className="text-[16px]">{t("rp.title")}</b>
+              <div className="dim text-[12.5px] mt-1 mb-4">{t("rp.reason")}</div>
+              <div className="flex flex-col gap-[9px]">
+                {(
+                  [
+                    ["rain", t("rp.rain")],
+                    ["closed", t("rp.closed")],
+                    ["relaxed", t("rp.relaxed")],
+                    ["adventurous", t("rp.adventurous")],
+                  ] as [ReplanReason, string][]
+                ).map(([k, l]) => (
+                  <button
+                    key={k}
+                    className="wz-chip tap"
+                    style={{ justifyContent: "flex-start" }}
+                    disabled={replanning}
+                    onClick={() => doReplan(replanFor, k, close)}
+                  >
+                    {replanning ? "✨ …" : l}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+        </SheetShell>
       )}
     </>
   );

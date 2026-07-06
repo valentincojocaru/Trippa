@@ -1,8 +1,10 @@
 "use client";
 
-/* Imperative toast, ported from the reference `toast()` helper. */
+/* Imperative toast. A Framer spring pops it up from the tab bar and eases it
+   away, matching the motion language of the bottom sheet. */
 
 import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 let push: ((msg: string) => void) | null = null;
 
@@ -12,25 +14,35 @@ export function toast(msg: string) {
 
 export default function Toaster() {
   const [msg, setMsg] = useState<string | null>(null);
-  const [on, setOn] = useState(false);
 
   useEffect(() => {
-    let t1: ReturnType<typeof setTimeout>, t2: ReturnType<typeof setTimeout>;
+    let t: ReturnType<typeof setTimeout>;
     push = (m: string) => {
       setMsg(m);
-      requestAnimationFrame(() => setOn(true));
-      clearTimeout(t1);
-      clearTimeout(t2);
-      t1 = setTimeout(() => setOn(false), 1900);
-      t2 = setTimeout(() => setMsg(null), 2200);
+      clearTimeout(t);
+      t = setTimeout(() => setMsg(null), 2000);
     };
     return () => {
       push = null;
-      clearTimeout(t1);
-      clearTimeout(t2);
+      clearTimeout(t);
     };
   }, []);
 
-  if (!msg) return null;
-  return <div className={"tx-toast" + (on ? " on" : "")}>{msg}</div>;
+  return (
+    <AnimatePresence>
+      {msg && (
+        <motion.div
+          className="tx-toast fmot"
+          role="status"
+          aria-live="polite"
+          initial={{ opacity: 0, x: "-50%", y: 16, scale: 0.94 }}
+          animate={{ opacity: 1, x: "-50%", y: 0, scale: 1 }}
+          exit={{ opacity: 0, x: "-50%", y: 10, scale: 0.96 }}
+          transition={{ type: "spring", stiffness: 460, damping: 30 }}
+        >
+          {msg}
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
 }
