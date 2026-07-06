@@ -14,6 +14,7 @@ import ScreenHeader from "@/components/ScreenHeader";
 import EmptyState from "@/components/EmptyState";
 import EstimateBadge from "@/components/EstimateBadge";
 import { SkeletonList } from "@/components/Skeleton";
+import SheetShell from "@/components/SheetShell";
 import { useTrip } from "@/lib/useTrip";
 import { affiliateService } from "@/lib/services/affiliateService";
 import { hotelService } from "@/lib/services/hotelService";
@@ -202,65 +203,62 @@ export default function HotelsPage() {
 
       {/* compare sheet */}
       {open && (
-        <div
-          className="tx-overlay on"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setOpen(null);
-          }}
-        >
-          <div className="tx-sheet">
-            <div
-              className="ht-img"
-              style={{ backgroundImage: `url('${hotelPhoto(open, (list || []).indexOf(open))}')`, borderRadius: 16, marginBottom: 14 }}
-            />
-            <div className="flex items-center justify-between">
-              <div>
-                <b className="text-[17px]">{open.name}</b>
-                <div className="dim text-[12px] mt-[2px]">{open.area || city}</div>
+        <SheetShell ariaLabel={open.name} onClose={() => setOpen(null)}>
+          {(close) => (
+            <>
+              <div
+                className="ht-img"
+                style={{ backgroundImage: `url('${hotelPhoto(open, (list || []).indexOf(open))}')`, borderRadius: 16, marginBottom: 14 }}
+              />
+              <div className="flex items-center justify-between">
+                <div>
+                  <b className="text-[17px]">{open.name}</b>
+                  <div className="dim text-[12px] mt-[2px]">{open.area || city}</div>
+                </div>
+                <span className="ht-rating text-[15px]">{open.rating.toFixed(1)}</span>
               </div>
-              <span className="ht-rating text-[15px]">{open.rating.toFixed(1)}</span>
-            </div>
-            <div className="flex flex-wrap gap-[6px] my-3">
-              {open.petFriendly && <span className="ht-am">🐾 Pet friendly</span>}
-              {open.familyFriendly && <span className="ht-am">👨‍👩‍👧 Family</span>}
-              {open.freeCancellation && <span className="ht-am">Free cancellation</span>}
-              {open.breakfast && <span className="ht-am">Breakfast</span>}
-              {isMock && <EstimateBadge />}
-            </div>
-            <div className="sec-lbl mb-2">COMPARE PRICES</div>
-            <div className="flex flex-col gap-[9px]">
-              {dealsFor(open, city).map((d, i) => (
-                <a
-                  key={d.id}
-                  className={"ht-deal-row tap" + (i === 0 ? " best" : "")}
-                  href={d.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() =>
-                    affiliateService.logClick({
-                      provider: d.id,
-                      bookingType: "hotel",
-                      destination: city,
-                      tripId: trip.id,
-                    })
-                  }
-                >
-                  <span className="ht-dot" style={{ background: d.color }} />
-                  <div className="flex-1">
-                    <b className="text-[13.5px]">{d.name}</b>
-                    {"commission" in d && d.commission && <span className="badge ml-[6px]">partner</span>}
-                    {i === 0 && <span className="ht-best">Best price</span>}
-                  </div>
-                  <b className="text-[16px]">€{d.price}</b>
-                  <ArrowUpRight size={16} color="var(--text-3)" strokeWidth={2} className="ml-2" />
-                </a>
-              ))}
-            </div>
-            <button className="btn btn-ghost tap mt-4" onClick={() => setOpen(null)}>
-              Close
-            </button>
-          </div>
-        </div>
+              <div className="flex flex-wrap gap-[6px] my-3">
+                {open.petFriendly && <span className="ht-am">🐾 Pet friendly</span>}
+                {open.familyFriendly && <span className="ht-am">👨‍👩‍👧 Family</span>}
+                {open.freeCancellation && <span className="ht-am">Free cancellation</span>}
+                {open.breakfast && <span className="ht-am">Breakfast</span>}
+                {isMock && <EstimateBadge />}
+              </div>
+              <div className="sec-lbl mb-2">COMPARE PRICES</div>
+              <div className="flex flex-col gap-[9px]">
+                {dealsFor(open, city).map((d, i) => (
+                  <a
+                    key={d.id}
+                    className={"ht-deal-row tap" + (i === 0 ? " best" : "")}
+                    href={d.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() =>
+                      affiliateService.logClick({
+                        provider: d.id,
+                        bookingType: "hotel",
+                        destination: city,
+                        tripId: trip.id,
+                      })
+                    }
+                  >
+                    <span className="ht-dot" style={{ background: d.color }} />
+                    <div className="flex-1">
+                      <b className="text-[13.5px]">{d.name}</b>
+                      {"commission" in d && d.commission && <span className="badge ml-[6px]">partner</span>}
+                      {i === 0 && <span className="ht-best">Best price</span>}
+                    </div>
+                    <b className="text-[16px]">€{d.price}</b>
+                    <ArrowUpRight size={16} color="var(--text-3)" strokeWidth={2} className="ml-2" />
+                  </a>
+                ))}
+              </div>
+              <button className="btn btn-ghost tap mt-4" onClick={close}>
+                Close
+              </button>
+            </>
+          )}
+        </SheetShell>
       )}
     </>
   );
