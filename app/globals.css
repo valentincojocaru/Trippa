@@ -2127,6 +2127,25 @@ html[data-theme="dark"] .skel::after {
   background: var(--border-2);
   margin: -6px auto 12px;
 }
+/* when Framer Motion drives an element's transform/opacity, silence the CSS
+   transition so the two don't double-animate */
+.fmot { transition: none !important; }
+
+/* sliding active-tab indicator (Framer layoutId) */
+.tabbar .ico { position: relative; }
+.tab-pill {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 50%;
+  width: 52px;
+  margin-left: -26px;
+  border-radius: 14px;
+  background: var(--accent-soft);
+  z-index: 0;
+}
+.tabbar .ico > svg,
+.tabbar .ico > span.tab-lbl { position: relative; z-index: 1; }
 
 /* respect users who turn motion off */
 @media (prefers-reduced-motion: reduce) {
