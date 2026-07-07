@@ -1949,6 +1949,37 @@ select.tx-input { height: 50px; }
 .leaflet-container { font-family: inherit; }
 .leaflet-control-attribution { font-size: 9px; background: rgba(255, 255, 255, 0.7); }
 .leaflet-popup-content { font-family: inherit; font-size: 12.5px; }
+/* day-by-day route legend */
+.map-legend {
+  position: absolute;
+  left: 50%;
+  bottom: calc(24px + env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  display: flex;
+  gap: 14px;
+  max-width: min(92vw, 410px);
+  overflow-x: auto;
+  padding: 10px 15px;
+  border-radius: 15px;
+  scrollbar-width: none;
+}
+.map-legend::-webkit-scrollbar { display: none; }
+.map-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+}
+.map-legend-item i { width: 11px; height: 11px; border-radius: 4px; flex: 0 0 auto; }
+/* dark mode: tint OSM tiles so the map matches the app instead of glaring white */
+html[data-theme="dark"] .leaflet-tile {
+  filter: invert(1) hue-rotate(180deg) brightness(0.95) contrast(0.9);
+}
+html[data-theme="dark"] .map-full { background: #0b1220; }
+html[data-theme="dark"] .leaflet-control-attribution { background: rgba(17, 27, 50, 0.7); color: var(--text-2); }
 
 /* splash brand mark */
 .tp-mark {
